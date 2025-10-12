@@ -1,0 +1,7 @@
+#kanban-board {
+    min-height: 80vh;
+}
+.kanban-lane {
+    padding: 1rem;
+    border-radius: 10px;
+}
