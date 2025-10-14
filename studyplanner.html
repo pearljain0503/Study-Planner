@@ -1,0 +1,756 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pastel Planner — StudyFlow</title>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Google font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* Pastel theme variables */
+    :root{
+      --bg: #f6f9fb;
+      --bg-2: #f2f6f8;
+      --card: #ffffff;
+      --text: #24303b;
+      --muted: #64707b;
+      --accent: #9ad3c7;   /* pastel teal */
+      --accent-2: #ffd5c2; /* pastel peach */
+      --accent-3: #c7d2ff; /* pastel lavender */
+      --glass: rgba(255,255,255,0.6);
+      --border: rgba(36,48,59,0.06);
+      --success: #A8E6CF;
+      --warn: #FFD3B6;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg, var(--bg), var(--bg-2));
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      min-height:100vh;
+      padding:18px;
+    }
+
+    /* Container */
+    .container{max-width:1200px;margin:0 auto;padding:18px;}
+
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{
+      width:56px;height:56px;border-radius:12px;
+      background:linear-gradient(135deg,var(--accent),var(--accent-3));
+      display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;
+      box-shadow:0 8px 20px rgba(65,105,85,0.08);
+      font-family:monospace;
+      font-size:18px;
+    }
+    h1{margin:0;font-size:20px}
+    .subtitle{color:var(--muted);font-size:13px;margin-top:4px}
+
+    nav.topnav{display:flex;align-items:center;gap:8px;padding:8px;border-radius:999px;background:transparent}
+    nav.topnav a{color:var(--muted);text-decoration:none;padding:8px 12px;border-radius:8px;font-weight:600;font-size:14px}
+    nav.topnav a.active{color:var(--text);background:linear-gradient(90deg, rgba(154,211,199,0.25), rgba(199,210,255,0.15));box-shadow:0 6px 18px rgba(60,90,80,0.03)}
+
+    .layout{display:grid;grid-template-columns:320px 1fr;gap:20px}
+    .side{background:var(--card);padding:16px;border-radius:14px;border:1px solid var(--border);box-shadow:0 6px 18px rgba(40,50,60,0.03)}
+    .main{min-height:60vh}
+
+    .card{background:var(--card);padding:18px;border-radius:12px;border:1px solid var(--border);margin-bottom:16px;box-shadow:0 6px 18px rgba(40,50,60,0.02)}
+    .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .stat{padding:16px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.6), transparent);border:1px solid rgba(36,48,59,0.04)}
+    .stat h3{margin:0;font-size:13px}
+    .stat .big{font-size:22px;color:var(--text);font-weight:800;margin-top:6px}
+
+    /* Calendar */
+    .calendar{width:100%;background:transparent;padding:8px;border-radius:10px}
+    .cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+    .day{padding:10px;border-radius:10px;text-align:center;font-size:14px;color:var(--muted);background:transparent}
+    .day.today{background:linear-gradient(180deg,var(--accent),var(--accent-3));color:#fff;font-weight:700;box-shadow:0 6px 18px rgba(154,211,199,0.12)}
+    .day.has-event{position:relative}
+    .day.has-event::after{content:'';position:absolute;left:50%;transform:translateX(-50%);bottom:6px;width:8px;height:8px;border-radius:50%;background:var(--accent-2)}
+    .selected-outline{outline:3px solid rgba(154,211,199,0.36);border-radius:10px}
+
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+    input,textarea,select,button{font-family:inherit}
+    input,textarea,select{width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text)}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
+    .btn-primary{background:linear-gradient(90deg,var(--accent),var(--accent-3));color:#fff}
+    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+
+    .timer-large{font-size:44px;font-weight:800;color:var(--accent-2);text-align:center}
+    .tm-controls{display:flex;gap:12px;justify-content:center;margin-top:8px}
+
+    .chart-wrap{padding:12px;background:transparent;border-radius:10px;border:1px dashed rgba(36,48,59,0.03)}
+
+    footer{color:var(--muted);font-size:13px;margin-top:18px;text-align:center}
+
+    .badge{padding:6px 8px;border-radius:8px;background:linear-gradient(90deg, rgba(199,210,255,0.35), rgba(154,211,199,0.12));font-weight:700;color:var(--text);font-size:12px}
+
+    .events-list .event{padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.8), transparent);margin-bottom:8px;border:1px solid rgba(36,48,59,0.04)}
+    .trash{background:transparent;border:0;color:#ff6b6b;cursor:pointer;font-size:16px}
+
+    .quote{font-style:italic;color:var(--muted);font-size:14px;padding:8px;border-radius:8px;background:linear-gradient(90deg, rgba(199,210,255,0.12), rgba(154,211,199,0.06));margin-bottom:8px}
+
+    /* Responsive */
+    @media (max-width:1000px){
+      .layout{grid-template-columns:1fr; }
+      .stats-grid{grid-template-columns:repeat(2,1fr)}
+      .logo{width:48px;height:48px}
+      .brand h1{font-size:18px}
+    }
+    @media (max-width:600px){
+      .stats-grid{grid-template-columns:repeat(1,1fr)}
+      header{flex-direction:column;align-items:flex-start;gap:12px}
+      .tm-controls{flex-wrap:wrap}
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="app">
+    <header>
+      <div class="brand">
+        <div class="logo">SF</div>
+        <div>
+          <h1>StudyFlow — Pastel Planner</h1>
+          <div class="subtitle">Spacious layout • Pomodoro • Date-specific tasks</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:center;">
+        <nav class="topnav" id="nav">
+          <a href="#/" data-route="/" class="active">Dashboard</a>
+          <a href="#/planner" data-route="/planner">Daily Planner</a>
+          <a href="#/analytics" data-route="/analytics">Analytics</a>
+        </nav>
+        <div style="width:1px;height:36px;background:var(--border);border-radius:2px"></div>
+        <div style="text-align:right">
+          <div style="font-size:12px;color:var(--muted)">Signed in as</div>
+          <div style="font-weight:800">Pearl <span class="badge" style="margin-left:8px">Pro</span></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="layout" style="margin-top:8px;">
+      <aside class="side">
+        <div class="card" style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-size:13px;color:var(--muted)">Welcome</div>
+              <div style="font-weight:800">Pearl</div>
+            </div>
+            <div style="text-align:center;">
+              <div class="badge">PRO</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:12px">
+          <h4 style="margin:0 0 12px 0">Today’s Quote</h4>
+          <div id="daily-quote" class="quote">Loading inspirational quote...</div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-primary" id="refresh-quote">Refresh</button>
+            <button class="btn btn-ghost" id="copy-quote">Copy</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:12px">
+          <h4 style="margin-bottom:8px">Quick Actions</h4>
+          <button class="btn btn-primary" id="quick-add-event" style="width:100%;">+ Add Event</button>
+          <div style="height:10px"></div>
+          <button class="btn btn-ghost" id="quick-start" style="width:100%;">Start Pomodoro</button>
+        </div>
+
+        <div class="card">
+          <h4 style="margin-bottom:8px">Mini Calendar</h4>
+          <div id="side-mini-calendar" class="calendar"></div>
+        </div>
+      </aside>
+
+      <main class="main">
+        <!-- Dashboard -->
+        <section id="view-dashboard" class="view">
+          <div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+            <div>
+              <h2 style="margin:0">Welcome back, Pearl</h2>
+              <div class="subtitle">Focus on today's priorities</div>
+            </div>
+            <div style="text-align:right">
+              <div style="color:var(--muted);font-size:13px">Productivity</div>
+              <div style="font-weight:800;color:var(--text);font-size:20px" id="overview-productivity">0%</div>
+            </div>
+          </div>
+
+          <div class="card stats-grid" style="margin-top:12px;">
+            <div class="stat">
+              <div style="color:var(--muted)">Total Tasks</div>
+              <div class="big" id="stat-tasks">0</div>
+              <div style="color:var(--muted);font-size:12px">events scheduled</div>
+            </div>
+            <div class="stat">
+              <div style="color:var(--muted)">Pomodoro Sessions</div>
+              <div class="big" id="stat-pomo">0</div>
+              <div style="color:var(--muted);font-size:12px">sessions completed</div>
+            </div>
+            <div class="stat">
+              <div style="color:var(--muted)">Time Spent</div>
+              <div class="big" id="stat-minutes">0m</div>
+              <div style="color:var(--muted);font-size:12px">this week</div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 420px;gap:14px;margin-top:14px;">
+            <div class="card">
+              <h3 style="margin-top:0;">Upcoming Events</h3>
+              <div id="upcoming-events" class="events-list"></div>
+              <div id="empty-upcoming" style="color:var(--muted);padding:12px">No upcoming events.</div>
+            </div>
+
+            <div class="card">
+              <h3 style="margin-top:0;">Pomodoro Timer</h3>
+              <div style="padding:18px 0;text-align:center;">
+                <div class="timer-large" id="timer-display">25:00</div>
+                <div class="tm-controls">
+                  <button class="btn btn-primary" id="tm-start">Start</button>
+                  <button class="btn btn-ghost" id="tm-reset">Reset</button>
+                </div>
+                <div style="margin-top:10px;color:var(--muted);font-size:13px">Total sessions: <span id="total-sessions">0</span></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Planner -->
+        <section id="view-planner" class="view" style="display:none;">
+          <div style="display:grid;grid-template-columns:1fr 420px;gap:12px;">
+            <div>
+              <div class="card">
+                <div class="cal-head">
+                  <div>
+                    <strong id="cal-month-year"></strong>
+                    <div style="color:var(--muted);font-size:13px">Click any date to add or view events</div>
+                  </div>
+                  <div style="display:flex;gap:8px;">
+                    <button class="btn btn-ghost" id="prev-month">&lt;</button>
+                    <button class="btn btn-ghost" id="next-month">&gt;</button>
+                  </div>
+                </div>
+                <div class="calendar" id="calendar-root">
+                  <div class="cal-grid" id="calendar-grid"></div>
+                </div>
+
+                <div class="selected-date" id="selected-date-label" style="margin-top:12px;color:var(--muted)">Selected: -</div>
+
+                <div style="margin-top:12px;" class="card">
+                  <h4 style="margin:0 0 10px 0">Add Event</h4>
+                  <form id="add-event-form">
+                    <label>Title</label>
+                    <input id="evt-title" required placeholder="e.g. Study Algorithms" />
+                    <label>Time</label>
+                    <input id="evt-time" type="time" />
+                    <label>Description</label>
+                    <textarea id="evt-desc" rows="3" placeholder="Short note (optional)"></textarea>
+                    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+                      <button class="btn btn-primary" type="submit">Add Event</button>
+                      <button class="btn btn-ghost" type="button" id="clear-form">Clear</button>
+                      <button class="btn btn-ghost" type="button" id="goto-today">Go to Today</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="card">
+                <h4 style="margin-top:0">Events for selected date</h4>
+                <div id="events-for-day" class="events-list"></div>
+                <div id="no-events-day" style="color:var(--muted);padding:12px">No events for this date.</div>
+              </div>
+
+              <div class="card" style="margin-top:12px;">
+                <h4 style="margin-top:0">Mini Pomodoro</h4>
+                <div style="text-align:center;padding:12px;">
+                  <div id="mini-timer" style="font-weight:800;font-size:20px;color:var(--accent-2)">25:00</div>
+                  <div style="margin-top:8px;">
+                    <button class="btn btn-primary" id="mini-start">Start</button>
+                    <button class="btn btn-ghost" id="mini-reset">Reset</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Analytics -->
+        <section id="view-analytics" class="view" style="display:none;">
+          <div class="card chart-wrap">
+            <h3 style="margin-top:0">Weekly Study Time (minutes)</h3>
+            <canvas id="chart-line" height="120"></canvas>
+          </div>
+
+          <div class="card chart-wrap" style="margin-top:12px;">
+            <h3 style="margin-top:0">Task Distribution</h3>
+            <canvas id="chart-donut" height="120"></canvas>
+          </div>
+
+          <div class="card" style="margin-top:12px;">
+            <h3 style="margin-top:0">Quick Stats</h3>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px">
+              <div style="flex:1 1 200px;padding:12px;border-radius:8px;background:linear-gradient(90deg, rgba(154,211,199,0.12), rgba(199,210,255,0.06))">Sessions this week: <strong id="stat-week-sessions">0</strong></div>
+              <div style="flex:1 1 200px;padding:12px;border-radius:8px;background:linear-gradient(90deg, rgba(255,211,193,0.08), rgba(199,210,255,0.04))">Avg per day: <strong id="stat-avg-day">0m</strong></div>
+            </div>
+          </div>
+        </section>
+
+        <footer>Built with ♥ — pastel theme. Data is stored locally in your browser.</footer>
+      </main>
+    </div>
+  </div>
+
+<script>
+/* ---------------------------
+  Simple SPA routing (hash)
+----------------------------*/
+function setActiveRoute(path){
+  document.querySelectorAll('#nav a').forEach(a=>{
+    a.classList.toggle('active', a.getAttribute('href') === '#'+path);
+  });
+  document.querySelectorAll('.view').forEach(v=> v.style.display='none');
+  if(path === '/') document.getElementById('view-dashboard').style.display='block';
+  if(path === '/planner') document.getElementById('view-planner').style.display='block';
+  if(path === '/analytics') document.getElementById('view-analytics').style.display='block';
+}
+function onHashChange(){
+  const path = location.hash.replace('#','') || '/';
+  setActiveRoute(path);
+}
+window.addEventListener('hashchange', onHashChange);
+onHashChange();
+
+/* ---------------------------
+  Storage & models
+----------------------------*/
+const STORE_EVENTS_KEY = 'pastel_planner_events_v1';
+const STORE_POMO_KEY = 'pastel_planner_pomo_v1';
+const STORE_MINUTES_KEY = 'pastel_weekly_minutes_v1';
+
+function loadEvents(){ try{ return JSON.parse(localStorage.getItem(STORE_EVENTS_KEY) || '[]'); }catch(e){return []} }
+function saveEvents(events){ localStorage.setItem(STORE_EVENTS_KEY, JSON.stringify(events)); }
+function loadPomo(){ try{ return JSON.parse(localStorage.getItem(STORE_POMO_KEY) || '{}'); }catch(e){return {} } }
+function savePomo(state){ localStorage.setItem(STORE_POMO_KEY, JSON.stringify(state)); }
+
+/* ---------------------------
+  Calendar rendering (planner)
+----------------------------*/
+let today = new Date();
+let viewYear = today.getFullYear();
+let viewMonth = today.getMonth(); // 0-index
+const calendarGrid = document.getElementById('calendar-grid');
+const calMonthYear = document.getElementById('cal-month-year');
+const selectedLabel = document.getElementById('selected-date-label');
+let selectedDate = formatDateISO(today);
+
+function formatDateISO(d){ // accept Date or string
+  const D = (typeof d === 'string')? new Date(d): d;
+  const y = D.getFullYear(), m = String(D.getMonth()+1).padStart(2,'0'), dt = String(D.getDate()).padStart(2,'0');
+  return y+'-'+m+'-'+dt;
+}
+function startOfDay(d){ const x = new Date(d); x.setHours(0,0,0,0); return x; }
+function isoDayKey(d){ const dd = (d instanceof Date) ? new Date(d) : new Date(d); dd.setHours(0,0,0,0); return formatDateISO(dd); }
+
+function renderCalendar(){
+  calendarGrid.innerHTML = '';
+  calMonthYear.textContent = new Date(viewYear, viewMonth).toLocaleString(undefined,{month:'long',year:'numeric'});
+  const first = new Date(viewYear, viewMonth,1);
+  // convert Sunday=0 to Monday=0 style for layout (Mon start)
+  const startDay = (first.getDay() + 6) % 7;
+  const daysInMonth = new Date(viewYear, viewMonth+1,0).getDate();
+  const events = loadEvents();
+
+  // fill empty slots
+  for(let i=0;i<startDay;i++){
+    const el = document.createElement('div'); el.className='day'; el.style.opacity=0.4; el.textContent=''; calendarGrid.appendChild(el);
+  }
+  for(let d=1; d<=daysInMonth; d++){
+    const dt = new Date(viewYear, viewMonth, d);
+    const iso = formatDateISO(dt);
+    const el = document.createElement('div');
+    el.className='day';
+    el.textContent=d;
+    // mark today
+    if(formatDateISO(today) === iso) el.classList.add('today');
+    // mark event
+    if(events.some(e=> e.date===iso)) el.classList.add('has-event');
+    // highlight selected
+    if(selectedDate === iso) el.classList.add('selected-outline');
+    el.addEventListener('click', ()=>{ selectedDate = iso; selectedLabel.textContent = 'Selected: '+iso; renderEventsForDay(); renderCalendar(); location.hash='/planner'; });
+
+    calendarGrid.appendChild(el);
+  }
+}
+
+document.getElementById('prev-month').addEventListener('click', ()=>{ viewMonth--; if(viewMonth<0){viewMonth=11; viewYear--} renderCalendar();});
+document.getElementById('next-month').addEventListener('click', ()=>{ viewMonth++; if(viewMonth>11){viewMonth=0; viewYear++} renderCalendar();});
+document.getElementById('goto-today').addEventListener('click', ()=>{ viewMonth = today.getMonth(); viewYear = today.getFullYear(); selectedDate = formatDateISO(today); selectedLabel.textContent = 'Selected: ' + selectedDate; renderCalendar(); renderEventsForDay(); });
+
+renderCalendar();
+selectedLabel.textContent = 'Selected: '+selectedDate;
+
+/* ---------------------------
+  Events UI
+----------------------------*/
+const addForm = document.getElementById('add-event-form');
+addForm.addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const title = document.getElementById('evt-title').value.trim();
+  const time = document.getElementById('evt-time').value;
+  const desc = document.getElementById('evt-desc').value.trim();
+  if(!title) return alert('Please add a title');
+  const events = loadEvents();
+  events.push({id:Date.now(), date:selectedDate, title, time, desc});
+  saveEvents(events);
+  addForm.reset();
+  renderCalendar();
+  renderEventsForDay();
+  refreshOverview();
+});
+document.getElementById('clear-form').addEventListener('click', ()=> addForm.reset());
+
+function renderEventsForDay(){
+  const list = document.getElementById('events-for-day');
+  const noEv = document.getElementById('no-events-day');
+  list.innerHTML = '';
+  const events = loadEvents().filter(ev=> ev.date === selectedDate).sort((a,b)=> (a.time||'') > (b.time||'')?1:-1);
+  if(events.length===0){ noEv.style.display='block'; } else { noEv.style.display='none'; }
+  events.forEach(ev=>{
+    const el = document.createElement('div'); el.className='event';
+    el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+                      <div style="flex:1;">
+                        <div style="font-weight:800">${ev.title}</div>
+                        <div style="color:var(--muted);font-size:13px;margin-top:6px">${ev.time || ''}</div>
+                        ${ev.desc?'<div style="color:var(--muted);font-size:13px;margin-top:8px">'+escapeHtml(ev.desc)+'</div>':''}
+                      </div>
+                      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+                        <button class="trash" data-id="${ev.id}" title="Delete">🗑</button>
+                        <button class="btn btn-ghost edit-btn" data-id="${ev.id}" style="padding:6px 8px;font-weight:600">Edit</button>
+                      </div>
+                    </div>`;
+    list.appendChild(el);
+  });
+  // delete handlers
+  list.querySelectorAll('.trash').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = Number(btn.dataset.id);
+      const all = loadEvents().filter(x=> x.id !== id);
+      saveEvents(all);
+      renderCalendar(); renderEventsForDay(); refreshOverview();
+    });
+  });
+  // edit handlers (simple inline edit)
+  list.querySelectorAll('.edit-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = Number(btn.dataset.id);
+      const ev = loadEvents().find(x=> x.id === id);
+      if(!ev) return;
+      // populate form
+      document.getElementById('evt-title').value = ev.title;
+      document.getElementById('evt-time').value = ev.time || '';
+      document.getElementById('evt-desc').value = ev.desc || '';
+      // remove existing, then save on submit (we'll remove now to avoid duplicates)
+      const remaining = loadEvents().filter(x=> x.id !== id);
+      saveEvents(remaining);
+      renderCalendar();
+      renderEventsForDay();
+      refreshOverview();
+      // focus
+      document.getElementById('evt-title').focus();
+    });
+  });
+  renderUpcoming();
+}
+
+function renderUpcoming(){
+  const up = document.getElementById('upcoming-events');
+  const empty = document.getElementById('empty-upcoming');
+  up.innerHTML='';
+  const events = loadEvents().filter(e=> new Date(e.date + 'T00:00:00') >= startOfDay(new Date())).sort((a,b)=> new Date(a.date) - new Date(b.date));
+  if(events.length===0){ empty.style.display='block'; } else { empty.style.display='none'; }
+  events.slice(0,6).forEach(ev=>{
+    const el = document.createElement('div'); el.className='event';
+    el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+                      <div>
+                        <div style="font-weight:800">${ev.title}</div>
+                        <div style="color:var(--muted);font-size:13px">${ev.date} ${ev.time || ''}</div>
+                      </div>
+                      <div>
+                        <button class="trash" data-id="${ev.id}" title="Delete">🗑</button>
+                      </div>
+                    </div>`;
+    up.appendChild(el);
+  });
+  // delete handlers in upcoming
+  up.querySelectorAll('.trash').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = Number(btn.dataset.id);
+      const all = loadEvents().filter(x=> x.id !== id);
+      saveEvents(all);
+      renderCalendar(); renderEventsForDay(); refreshOverview();
+    });
+  });
+}
+
+/* quick add */
+document.getElementById('quick-add-event').addEventListener('click', ()=>{
+  location.hash = '/planner';
+  selectedDate = formatDateISO(new Date());
+  selectedLabel.textContent = 'Selected: ' + selectedDate;
+  renderEventsForDay();
+  renderCalendar();
+  setTimeout(()=> document.getElementById('evt-title').focus(), 200);
+});
+
+/* ---------------------------
+  Pomodoro timer (global + mini)
+----------------------------*/
+const TM_DEFAULT = {minutes:25, seconds:0, running:false, sessions: 0, lastStarted: null};
+let pomState = {...TM_DEFAULT, ...loadPomo()};
+updateTimerUI();
+
+let timerInterval = null;
+function startTimer(){
+  if(pomState.running) return;
+  pomState.running = true;
+  pomState.lastStarted = Date.now();
+  savePomo(pomState);
+  updateTimerUI();
+  timerInterval = setInterval(()=> {
+    if(pomState.seconds === 0){
+      if(pomState.minutes === 0){
+        pomState.running = false;
+        pomState.sessions = (pomState.sessions || 0) + 1;
+        addStudyMinutesForToday(25);
+        clearInterval(timerInterval);
+        timerInterval = null;
+        pomState.minutes = 25; pomState.seconds = 0;
+        savePomo(pomState);
+        refreshOverview();
+        updateTimerUI();
+        // small notification
+        try{ new Notification && new Notification('Pomodoro complete!'); }catch(e){}
+        return;
+      } else {
+        pomState.minutes -= 1;
+        pomState.seconds = 59;
+      }
+    } else {
+      pomState.seconds -= 1;
+    }
+    savePomo(pomState);
+    updateTimerUI();
+  }, 1000);
+}
+function resetTimer(){
+  pomState.running = false;
+  pomState.minutes = 25; pomState.seconds = 0;
+  savePomo(pomState);
+  if(timerInterval) clearInterval(timerInterval);
+  timerInterval = null;
+  updateTimerUI();
+}
+function updateTimerUI(){
+  const mm = String(pomState.minutes).padStart(2,'0');
+  const ss = String(pomState.seconds).padStart(2,'0');
+  document.getElementById('timer-display').textContent = mm+':'+ss;
+  document.getElementById('total-sessions').textContent = pomState.sessions || 0;
+  document.getElementById('stat-pomo').textContent = pomState.sessions || 0;
+}
+document.getElementById('tm-start').addEventListener('click', ()=> { startTimer(); });
+document.getElementById('tm-reset').addEventListener('click', ()=> { resetTimer(); });
+
+/* mini timer (separate) */
+let mini = {minutes:25, seconds:0, running:false, interval:null};
+const miniDisplay = document.getElementById('mini-timer');
+function miniStart(){
+  if(mini.running) return;
+  mini.running = true;
+  mini.interval = setInterval(()=>{
+    if(mini.seconds===0){
+      if(mini.minutes===0){
+        mini.running=false; clearInterval(mini.interval); mini.interval=null;
+        mini.minutes = 25; mini.seconds = 0;
+        addStudyMinutesForToday(25);
+        refreshOverview();
+        return;
+      } else { mini.minutes--; mini.seconds = 59; }
+    } else mini.seconds--;
+    miniDisplay.textContent = String(mini.minutes).padStart(2,'0')+':'+String(mini.seconds).padStart(2,'0');
+  },1000);
+}
+function miniReset(){ if(mini.interval) clearInterval(mini.interval); mini.running=false; mini.minutes=25; mini.seconds=0; miniDisplay.textContent='25:00'; }
+document.getElementById('mini-start').addEventListener('click', miniStart);
+document.getElementById('mini-reset').addEventListener('click', miniReset);
+document.getElementById('quick-start').addEventListener('click', ()=>{ startTimer(); location.hash='/planner'; });
+
+/* ---------------------------
+  Weekly minutes (analytics)
+----------------------------*/
+function addStudyMinutesForToday(mins){
+  const raw = JSON.parse(localStorage.getItem(STORE_MINUTES_KEY) || '{}');
+  const todayKey = isoDayKey(new Date());
+  raw[todayKey] = (raw[todayKey]||0) + (mins||0);
+  localStorage.setItem(STORE_MINUTES_KEY, JSON.stringify(raw));
+  updateCharts();
+}
+function getWeeklyMinutes(){
+  const raw = JSON.parse(localStorage.getItem(STORE_MINUTES_KEY) || '{}');
+  const out = [];
+  const now = new Date();
+  for(let i=6;i>=0;i--){
+    const d = new Date(now); d.setDate(now.getDate() - i);
+    const k = isoDayKey(d);
+    out.push({date:k, minutes: raw[k] || 0});
+  }
+  return out;
+}
+
+/* ---------------------------
+  Charts (Chart.js)
+----------------------------*/
+let lineChart = null, donutChart = null;
+function initCharts(){
+  const ctxLine = document.getElementById('chart-line').getContext('2d');
+  const ctxDonut = document.getElementById('chart-donut').getContext('2d');
+  lineChart = new Chart(ctxLine, {
+    type:'line',
+    data:{labels:[],datasets:[{label:'Minutes',data:[],tension:0.3,fill:true,backgroundColor:'rgba(154,211,199,0.25)',borderColor:'rgba(154,211,199,0.9)',pointRadius:4}]},
+    options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+  });
+  donutChart = new Chart(ctxDonut, {
+    type:'doughnut',
+    data:{labels:['Planned','Unplanned'],datasets:[{data:[0,1],backgroundColor:['rgba(154,211,199,0.9)','rgba(255,213,182,0.9)']}]},
+    options:{plugins:{legend:{position:'bottom'}}}
+  });
+  updateCharts();
+}
+function updateCharts(){
+  const wk = getWeeklyMinutes();
+  const labels = wk.map(x=> new Date(x.date).toLocaleDateString(undefined,{weekday:'short'}));
+  const data = wk.map(x=> x.minutes);
+  if(lineChart){
+    lineChart.data.labels = labels;
+    lineChart.data.datasets[0].data = data;
+    lineChart.update();
+  }
+  // donut: planned vs unplanned based on events count this week (planned = events scheduled this week)
+  const events = loadEvents();
+  const weekStart = startOfDay(new Date(new Date().setDate(new Date().getDate()-6)));
+  const planned = events.filter(e=> new Date(e.date + 'T00:00:00') >= weekStart).length;
+  // estimate unplanned by dividing minutes by a session (25)
+  const minutesTotal = wk.reduce((a,b)=>a+b.minutes,0);
+  const estimatedSessions = Math.round(minutesTotal / 25);
+  const unplanned = Math.max(0, estimatedSessions - planned);
+  if(donutChart){
+    donutChart.data.datasets[0].data = [planned, Math.max(1, unplanned)];
+    donutChart.update();
+  }
+  // update quick stats
+  document.getElementById('stat-week-sessions').textContent = (loadPomo().sessions || 0);
+  document.getElementById('stat-minutes').textContent = minutesTotal + 'm';
+  document.getElementById('stat-avg-day').textContent = Math.round(minutesTotal/7) + 'm';
+}
+
+/* ---------------------------
+  Overview refresh (counts)
+----------------------------*/
+function refreshOverview(){
+  const events = loadEvents();
+  document.getElementById('stat-tasks').textContent = events.length;
+  document.getElementById('stat-pomo').textContent = (loadPomo().sessions || 0);
+  renderUpcoming();
+  renderEventsForDay();
+  const productivity = Math.round(((loadPomo().sessions || 0) / (events.length+1)) * 100);
+  document.getElementById('overview-productivity').textContent = productivity + '%';
+  updateCharts();
+}
+
+/* ---------------------------
+  Utility helpers
+----------------------------*/
+function escapeHtml(s){ return String(s || '').replace(/[&<>"']/g, c=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]) ); }
+
+/* ---------------------------
+  Daily quote (fetch API)
+----------------------------*/
+const QUOTE_EL = document.getElementById('daily-quote');
+async function fetchQuote(){
+  // using a free quote API with CORS-friendly endpoint
+  const fallback = {content: "Keep going — progress is progress, no matter how small.", author: "Unknown"};
+  try{
+    const res = await fetch('https://api.quotable.io/random?tags=technology|inspirational|wisdom');
+    if(!res.ok) throw new Error('quote fetch failed');
+    const data = await res.json();
+    QUOTE_EL.textContent = `“${data.content}” — ${data.author || 'Unknown'}`;
+  } catch(e){
+    // fallback
+    QUOTE_EL.textContent = `“${fallback.content}” — ${fallback.author}`;
+  }
+}
+document.getElementById('refresh-quote').addEventListener('click', fetchQuote);
+document.getElementById('copy-quote').addEventListener('click', ()=>{
+  const txt = QUOTE_EL.textContent || '';
+  if(!txt) return;
+  navigator.clipboard && navigator.clipboard.writeText(txt).then(()=> alert('Quote copied to clipboard.'));
+});
+fetchQuote(); // initial
+
+/* ---------------------------
+  Side mini calendar render
+----------------------------*/
+(function renderSideMini(){
+  const el = document.getElementById('side-mini-calendar');
+  el.innerHTML = '';
+  const now = new Date();
+  const monthName = now.toLocaleString(undefined,{month:'short'});
+  el.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-weight:800">'+monthName+' '+now.getFullYear()+'</div></div>';
+  const miniGrid = document.createElement('div'); miniGrid.className='cal-grid'; miniGrid.style.marginTop='8px';
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1,0).getDate();
+  const events = loadEvents();
+  for(let i=1;i<=daysInMonth;i++){
+    const d = i; const day = document.createElement('div'); day.className='day'; day.textContent = d;
+    const iso = formatDateISO(new Date(now.getFullYear(), now.getMonth(), d));
+    if(formatDateISO(now) === iso) day.classList.add('today');
+    if(events.some(e=> e.date===iso)) day.classList.add('has-event');
+    miniGrid.appendChild(day);
+  }
+  el.appendChild(miniGrid);
+  el.addEventListener('click', ()=>{ location.hash='/planner'; });
+})();
+
+/* ---------------------------
+  Init charts & UI
+----------------------------*/
+initCharts();
+renderEventsForDay();
+refreshOverview();
+renderCalendar();
+
+/* small shim for Notification permission (best-effort) */
+if("Notification" in window && Notification.permission !== "granted"){
+  try{ Notification.requestPermission().catch(()=>{}); }catch(e){}
+}
+
+/* extra: go to planner when calendar clicked in side */
+document.getElementById('side-mini-calendar').addEventListener('click', ()=> location.hash='/planner');
+
+</script>
+</body>
+</html>
