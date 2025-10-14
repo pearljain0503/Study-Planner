@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudyFlow — Login & Signup</title>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #F9FAFB;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .pointer { cursor: pointer; }
+
+    .container {
+      position: relative;
+      width: 850px;
+      max-width: 100%;
+      min-height: 550px;
+      background: #ffffff;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .forms-container {
+      position: absolute;
+      top: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .signin-signup {
+      position: absolute;
+      top: 50%;
+      left: 75%;
+      transform: translate(-50%, -50%);
+      width: 50%;
+      display: grid;
+      grid-template-columns: 1fr;
+      z-index: 5;
+      transition: 1s 0.7s ease-in-out;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 5rem;
+      grid-column: 1 / 2;
+      grid-row: 1 / 2;
+    }
+
+    form.sign-up-form {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .title {
+      font-size: 2.2rem;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .input-field {
+      max-width: 380px;
+      width: 100%;
+      height: 55px;
+      background: #EAF2FF;
+      margin: 10px 0;
+      border-radius: 50px;
+      display: grid;
+      grid-template-columns: 15% 85%;
+      padding: 0 .4rem;
+    }
+
+    .input-field i {
+      text-align: center;
+      line-height: 55px;
+      color: #5A8DEE;
+      font-size: 1.2rem;
+    }
+
+    .input-field input {
+      background: none;
+      border: none;
+      outline: none;
+      line-height: 1;
+      font-size: 1rem;
+      color: #333;
+    }
+
+    /* Button (Modern Blue Scheme) */
+    .btn {
+      width: 150px;
+      background: #5A8DEE; /* Blue background */
+      border: 2px solid #5A8DEE;
+      outline: none;
+      height: 49px;
+      border-radius: 49px;
+      color: #fff;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin: 10px 0;
+      cursor: pointer;
+      transition: .3s;
+    }
+
+    .btn:hover {
+      background: #F9FAFB; /* Page background color */
+      color: #5A8DEE; /* Blue text */
+      border: 2px solid #5A8DEE;
+    }
+
+    .social-text {
+      padding: .7rem 0;
+      font-size: 1rem;
+    }
+
+    .social-media {
+      display: flex;
+      justify-content: center;
+    }
+
+    .social-icon {
+      height: 46px;
+      width: 46px;
+      border: 1px solid #5A8DEE;
+      margin: 0 .45rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      font-size: 1.1rem;
+      color: #5A8DEE;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+
+    .social-icon:hover {
+      background: #5A8DEE;
+      color: #fff;
+      border-color: #5A8DEE;
+    }
+
+    .panels-container {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .panel {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: space-around;
+      text-align: center;
+      z-index: 6;
+    }
+
+    .panel .content {
+      color: #fff;
+      transition: .9s .6s ease-in-out;
+    }
+
+    .left-panel {
+      pointer-events: all;
+      padding: 3rem 12% 2rem 17%;
+      background: linear-gradient(135deg, #5A8DEE, #7FC8F8);
+    }
+
+    .right-panel {
+      pointer-events: none;
+      padding: 3rem 17% 2rem 12%;
+      background: linear-gradient(135deg, #7FC8F8, #5A8DEE);
+      opacity: 0;
+    }
+
+    .container.sign-up-mode .signin-signup {
+      left: 25%;
+    }
+
+    .container.sign-up-mode form.sign-up-form {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .container.sign-up-mode form.sign-in-form {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .container.sign-up-mode .right-panel {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .container.sign-up-mode .left-panel {
+      opacity: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="container" class="container sign-in">
+    <div class="forms-container">
+      <div class="signin-signup">
+        <!-- Sign In Form -->
+        <form class="sign-in-form">
+          <h2 class="title">Sign In</h2>
+          <div class="input-field"><i class='bx bx-user'></i><input type="text" placeholder="Username" required></div>
+          <div class="input-field"><i class='bx bx-lock'></i><input type="password" placeholder="Password" required></div>
+          <button type="button" class="btn" onclick="login()">Login</button>
+        </form>
+
+        <!-- Sign Up Form -->
+        <form class="sign-up-form">
+          <h2 class="title">Sign Up</h2>
+          <div class="input-field"><i class='bx bx-user'></i><input type="text" placeholder="Username" required></div>
+          <div class="input-field"><i class='bx bx-envelope'></i><input type="email" placeholder="Email" required></div>
+          <div class="input-field"><i class='bx bx-lock'></i><input type="password" placeholder="Password" required></div>
+          <button type="button" class="btn" onclick="signup()">Sign Up</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="panels-container">
+      <div class="panel left-panel">
+        <div class="content">
+          <h3>New here?</h3>
+          <p>Create an account to access your personalized StudyFlow dashboard!</p>
+          <button class="btn pointer" id="sign-up-btn">Sign Up</button>
+        </div>
+      </div>
+      <div class="panel right-panel">
+        <div class="content">
+          <h3>One of us?</h3>
+          <p>Login with your credentials to continue your journey.</p>
+          <button class="btn pointer" id="sign-in-btn">Sign In</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+const container = document.getElementById('container');
+
+// Toggle panels
+document.getElementById('sign-up-btn').onclick = () => container.classList.add('sign-up-mode');
+document.getElementById('sign-in-btn').onclick = () => container.classList.remove('sign-up-mode');
+
+// SIGN UP FUNCTION
+function signup() {
+  const username = document.querySelector('.sign-up-form input[placeholder="Username"]').value.trim();
+  const email = document.querySelector('.sign-up-form input[placeholder="Email"]').value.trim();
+  const password = document.querySelector('.sign-up-form input[placeholder="Password"]').value.trim();
+
+  if(!username || !email || !password){
+    alert("Please fill all fields!");
+    return;
+  }
+
+  // Save to localStorage
+  localStorage.setItem('sf_username', username);
+  localStorage.setItem('sf_email', email);
+  localStorage.setItem('sf_password', password);
+
+  alert("Account Created Successfully!");
+  // Optionally switch to login panel
+  container.classList.remove('sign-up-mode');
+}
+
+// LOGIN FUNCTION
+function login() {
+  const username = document.querySelector('.sign-in-form input[placeholder="Username"]').value.trim();
+  const password = document.querySelector('.sign-in-form input[placeholder="Password"]').value.trim();
+
+  const storedUsername = localStorage.getItem('sf_username');
+  const storedPassword = localStorage.getItem('sf_password');
+
+  if(username === storedUsername && password === storedPassword){
+    alert("Login Successful!");
+    window.location.href = "index.html"; // Dashboard
+  } else {
+    alert("Invalid username or password!");
+  }
+}
+</script>
+
+
+</body>
+</html>
