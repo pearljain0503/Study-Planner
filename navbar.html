@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study Planner — Navigation</title>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+    }
+    h1 {
+      margin-bottom: 20px;
+      font-size: 2rem;
+      letter-spacing: 1px;
+    }
+    .nav-buttons {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    button {
+      background: #fff;
+      color: #764ba2;
+      border: none;
+      padding: 12px 22px;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s ease;
+      font-weight: 600;
+    }
+    button:hover {
+      background: #764ba2;
+      color: #fff;
+      transform: scale(1.05);
+    }
+    footer {
+      position: absolute;
+      bottom: 15px;
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.7);
+    }
+  </style>
+</head>
+<body>
+  <h1>Welcome, <span id="username"></span> 👋</h1>
+  <p>Choose where you want to go:</p>
+
+  <div class="nav-buttons">
+    <button onclick="goToDashboard()">📊 Dashboard</button>
+    <button onclick="goToPlanner()">🗓️ Planner</button>
+    <button onclick="goToToDo()">✅ To-Do</button>
+    <button onclick="goToHome()">🏠 Home</button>
+    <button onclick="logout()">🚪 Logout</button>
+  </div>
+
+  <footer>Study Planner © 2025</footer>
+
+  <script>
+    document.getElementById("username").textContent = localStorage.getItem('sf_username') || "User";
+
+    function goToDashboard() {
+      window.location.href = "dashboard/Signup.html";
+    }
+    function goToPlanner() {
+      window.location.href = "planner/studyplanner.html";
+    }
+    function goToToDo() {
+      window.location.href = "ToDo/index.html";
+    }
+    function goToHome() {
+      window.location.href = "index.html";
+    }
+    function logout() {
+      localStorage.clear();
+      alert("Logged out successfully!");
+      window.location.href = "signup.html";
+    }
+  </script>
+</body>
+</html>

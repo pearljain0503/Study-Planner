@@ -279,6 +279,7 @@ function signup() {
 }
 
 // LOGIN FUNCTION
+// LOGIN FUNCTION
 function login() {
   const username = document.querySelector('.sign-in-form input[placeholder="Username"]').value.trim();
   const password = document.querySelector('.sign-in-form input[placeholder="Password"]').value.trim();
@@ -288,11 +289,16 @@ function login() {
 
   if(username === storedUsername && password === storedPassword){
     alert("Login Successful!");
-    window.location.href = "index.html"; // Dashboard
+
+    // Redirect user to a simple navigation page (after login)
+    window.location.href = "planner/studyplanner.html";
+
   } else {
     alert("Invalid username or password!");
   }
 }
+
+
 </script>
 
 
