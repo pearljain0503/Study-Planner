@@ -302,36 +302,35 @@
 </head>
 
 <body>
- <!-- Inside your <nav> ... keep everything else the same -->
-<nav class="navbar navbar-expand-lg navbar-custom fixed-top">
-  <div class="container-fluid px-4">
-    <a class="navbar-brand" href="#"><i class="bi bi-journal-bookmark"></i> Study Planner</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navMenu">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item"><a class="nav-link" href="#">Dashboard</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Planner</a></li>
-        <li class="nav-item"><a class="nav-link active" href="#">Task Board</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Pomodoro</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Analytics</a></li>
-      </ul>
-
-      
-      <div class="dropdown">
-        <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
-          data-bs-toggle="dropdown">
-          <img src="https://cdn-icons-png.flaticon.com/512/219/219983.png" class="avatar me-2" alt="User">
-          <span>Profile</span>
-        </a>
-        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-          <li><a class="dropdown-item text-danger" href="#">Logout</a></li>
+  <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand" href="#"><i class="bi bi-journal-bookmark"></i> Study Planner</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="#">Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Planner</a></li>
+          <li class="nav-item"><a class="nav-link active" href="#">Task Board</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Pomodoro</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Analytics</a></li>
         </ul>
+
+
+        <div class="dropdown">
+          <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+            data-bs-toggle="dropdown">
+            <img src="https://cdn-icons-png.flaticon.com/512/219/219983.png" class="avatar me-2" alt="User">
+            <span>Profile</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+            <li><a class="dropdown-item text-danger" href="#">Logout</a></li>
+          </ul>
+        </div>
       </div>
     </div>
-  </div>
-</nav>
+  </nav>
 
   <!-- === HEADER === -->
   <header>
@@ -358,7 +357,8 @@
         <button id="btnQuickAdd" class="btn-primary">Add Task</button>
       </div>
       <div class="controls">
-        <button id="btnOpenModal" class="btn btn-outline-primary btn-sm"><i class="bi bi-pencil-square"></i> Add / Edit</button>
+        <button id="btnOpenModal" class="btn btn-outline-primary btn-sm"><i class="bi bi-pencil-square"></i> Add /
+          Edit</button>
         <button id="btnClear" class="btn btn-outline-danger btn-sm">Clear All</button>
       </div>
     </div>
@@ -375,18 +375,30 @@
     </div>
 
     <div class="board" id="board">
-      <div class="lane" data-lane="backlog"><h5>Backlog</h5><div class="cards"></div></div>
-      <div class="lane" data-lane="todo"><h5>To Do</h5><div class="cards"></div></div>
-      <div class="lane" data-lane="inProgress"><h5>In Progress</h5><div class="cards"></div></div>
-      <div class="lane" data-lane="done"><h5>Done</h5><div class="cards"></div></div>
+      <div class="lane" data-lane="backlog">
+        <h5>Backlog</h5>
+        <div class="cards"></div>
+      </div>
+      <div class="lane" data-lane="todo">
+        <h5>To Do</h5>
+        <div class="cards"></div>
+      </div>
+      <div class="lane" data-lane="inProgress">
+        <h5>In Progress</h5>
+        <div class="cards"></div>
+      </div>
+      <div class="lane" data-lane="done">
+        <h5>Done</h5>
+        <div class="cards"></div>
+      </div>
     </div>
 
-   <div class="analytics">
-  <div class="chart-card">
-    <h6>Status Overview</h6>
-    <canvas id="chartStatus" width="280" height="160"></canvas>
-  </div>
-</div>
+    <div class="analytics">
+      <div class="chart-card">
+        <h6>Status Overview</h6>
+        <canvas id="chartStatus" width="280" height="160"></canvas>
+      </div>
+    </div>
 
 
     <div class="footer-note">Drag tasks through stages to visualize workflow. Completed tasks are locked.</div>
@@ -402,7 +414,8 @@
         </div>
         <form id="taskForm" class="modal-body">
           <input type="hidden" id="taskId">
-          <div class="mb-2"><input id="title" class="form-control" placeholder="Task title" maxlength="120" required></div>
+          <div class="mb-2"><input id="title" class="form-control" placeholder="Task title" maxlength="120" required>
+          </div>
           <div class="mb-2"><textarea id="description" class="form-control" rows="3"
               placeholder="Description (optional)" maxlength="800"></textarea></div>
           <div class="row g-2 mb-2">
@@ -429,11 +442,9 @@
     </div>
   </div>
 
-  <!-- === Bootstrap Bundle & Logic === -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    /* === FULL JS LOGIC (add/edit/delete/drag/drop/charts/validation) === */
     const STORAGE_KEY = "study_planner_prof_v1";
     const loadItems = () => JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
     const saveItems = arr => localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
@@ -449,21 +460,37 @@
         if (!title) return alert("Enter a title.");
         const arr = loadItems();
         arr.push({ id: newId(), title, description: "", due: null, priority: prio, lane, completed: lane === "done" });
-        saveItems(arr); quickTitle.value = ""; renderBoard();
+        saveItems(arr);
+        window.dispatchEvent(new Event("storage")); 
+        quickTitle.value = "";
+        renderBoard();
+
       };
 
       btnOpenModal.onclick = () => openModal();
-      btnClear.onclick = () => { if (confirm("Delete all tasks?")) { localStorage.removeItem(STORAGE_KEY); renderBoard(); } };
+btnClear.onclick = () => {
+  if (confirm("Delete all tasks?")) {
+    localStorage.removeItem(STORAGE_KEY);
+    window.dispatchEvent(new Event("storage")); // 🔔 React auto-refresh
+    renderBoard();
+  }
+};
       taskForm.onsubmit = e => {
         e.preventDefault();
         const id = taskId.value || newId();
         const title = titleEl.value.trim();
         if (!title) return alert("Title required.");
         const due = dueEl.value, lane = laneSel.value;
-        const obj = { id, title, description: desc.value.trim(), due: due || null, priority: priority.value, lane, completed: lane === "done" };
-        const arr = loadItems(); const idx = arr.findIndex(x => x.id === id);
-        if (idx > -1) arr[idx] = obj; else arr.push(obj);
-        saveItems(arr); bootstrap.Modal.getInstance(taskModal).hide(); renderBoard();
+        const obj = { id, title, description: desc.value.trim(), due: 
+          due || null, priority: priority.value, lane, completed: lane === "done" };
+        const arr = loadItems(); 
+        const idx = arr.findIndex(x => x.id === id);
+       if (idx > -1) arr[idx] = obj; else arr.push(obj);
+        saveItems(arr);
+        window.dispatchEvent(new Event("storage")); // 🔔 React auto-refresh
+        bootstrap.Modal.getInstance(taskModal).hide();
+        renderBoard();
+
       };
     });
 
@@ -499,8 +526,15 @@
       document.querySelectorAll(".deleteBtn").forEach(b => b.onclick = () => { if (confirm("Delete task?")) { saveItems(loadItems().filter(x => x.id !== b.closest(".card-task").dataset.id)); renderBoard(); } });
       document.querySelectorAll(".toggleBtn").forEach(b => b.onclick = () => {
         const id = b.closest(".card-task").dataset.id, arr = loadItems();
-        arr.forEach(a => { if (a.id === id) { a.completed = !a.completed; a.lane = a.completed ? "done" : "todo"; } });
-        saveItems(arr); renderBoard();
+       arr.forEach(a => {
+        if (a.id === id) {
+          a.completed = !a.completed;
+          a.lane = a.completed ? "done" : "todo";
+        }
+      });
+      saveItems(arr);
+      window.dispatchEvent(new Event("storage")); // 🔔 React auto-refresh
+      renderBoard();
       });
     }
 
@@ -511,38 +545,42 @@
           const id = e.dataTransfer.getData("text/plain"), arr = loadItems(), t = arr.find(x => x.id === id);
           if (!t) return;
           if (t.lane === "done") return alert("Cannot move completed tasks.");
-          t.lane = l.dataset.lane; if (t.lane === "done") t.completed = true;
-          saveItems(arr); renderBoard();
+         t.lane = l.dataset.lane;
+        if (t.lane === "done") t.completed = true;
+        saveItems(arr);
+        window.dispatchEvent(new Event("storage")); // 🔔 React auto-refresh
+        renderBoard();
+
         });
       });
     }
 
     let chart1;
-function updateCharts() {
-  const arr = loadItems();
-  const done = arr.filter(t => t.lane === "done").length;
-  const total = arr.length || 1;
-  
-  // update progress bar
-  const pct = Math.round((done / total) * 100);
-  progressBar.style.width = pct + "%";
-  progressLabel.textContent = pct + "% Completed";
-  
-  // update status chart only
-  const ctx1 = document.getElementById("chartStatus").getContext("2d");
-  if (chart1) chart1.destroy();
-  chart1 = new Chart(ctx1, {
-    type: "doughnut",
-    data: {
-      labels: ["Backlog", "To Do", "In Progress", "Done"],
-      datasets: [{
-        data: ["backlog", "todo", "inProgress", "done"].map(l => arr.filter(t => t.lane === l).length),
-        backgroundColor: ["#b5beca", "#a7c4f2", "#f6d67c", "#7cbfa2"]
-      }]
-    },
-    options: { plugins: { legend: { position: "bottom" } } }
-  });
-}
+    function updateCharts() {
+      const arr = loadItems();
+      const done = arr.filter(t => t.lane === "done").length;
+      const total = arr.length || 1;
+
+      // update progress bar
+      const pct = Math.round((done / total) * 100);
+      progressBar.style.width = pct + "%";
+      progressLabel.textContent = pct + "% Completed";
+
+      // update status chart only
+      const ctx1 = document.getElementById("chartStatus").getContext("2d");
+      if (chart1) chart1.destroy();
+      chart1 = new Chart(ctx1, {
+        type: "doughnut",
+        data: {
+          labels: ["Backlog", "To Do", "In Progress", "Done"],
+          datasets: [{
+            data: ["backlog", "todo", "inProgress", "done"].map(l => arr.filter(t => t.lane === l).length),
+            backgroundColor: ["#b5beca", "#a7c4f2", "#f6d67c", "#7cbfa2"]
+          }]
+        },
+        options: { plugins: { legend: { position: "bottom" } } }
+      });
+    }
     function openModal(id) {
       const modal = new bootstrap.Modal(document.getElementById("taskModal"));
       taskForm.reset(); taskId.value = ""; document.getElementById("due").setAttribute("min", todayISO());
@@ -554,5 +592,13 @@ function updateCharts() {
       modal.show();
     }
   </script>
+  <!-- React Core (no npm needed) -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+  <!-- External React Logic -->
+  <script src="react.js"></script>
+
 </body>
+
 </html>
