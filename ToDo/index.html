@@ -2,165 +2,557 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Todo</title>
-  <!-- BOOTSTRAP ICONS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" />
-  <!-- BOOTSTRAP -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Study Planner — Task Board</title>
 
-  <!-- CUSTOM CSS -->
-  <link rel="stylesheet" href="./main.css" />
+  <!-- Favicon, Fonts, Bootstrap, Icons, Chart.js -->
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/4205/4205930.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --bg: #f5f7fa;
+      --card: #ffffff;
+      --muted: #55595a;
+      --border: #d9dfe6;
+      --accent: #3f5f86;
+      --accent-2: #5b83a8;
+      --lane: #f2f6fa;
+      --lane-alt: #eef3f7;
+      --low: #72b48a;
+      --medium: #e7c56b;
+      --high: #e36b6b;
+      --due-soon: #fff9e6;
+      --due-today: #fff2f2;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg, var(--bg) 0%, #fff 100%);
+      color: #1f2326;
+      padding-top: 80px;
+    }
+
+    /* Navbar */
+    .navbar-custom {
+      background: linear-gradient(90deg, #5b83a8, #7a9bbf);
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-brand {
+      color: #fff !important;
+      font-weight: 600;
+    }
+
+    .nav-link {
+      color: #e7ebf0 !important;
+      margin-right: 12px;
+    }
+
+    .nav-link:hover {
+      color: #fff !important;
+      transform: translateY(-1px);
+    }
+
+    .nav-link.active {
+      background-color: rgba(255, 255, 255, 0.25);
+      border-radius: 6px;
+      padding: 6px 10px;
+      color: #fff !important;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      object-fit: cover;
+    }
+
+    /* Header */
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    header img {
+      width: 68px;
+      display: block;
+      margin: 0 auto 10px;
+    }
+
+    header h1 {
+      margin: 0;
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 1.6rem;
+    }
+
+    header p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    /* Main Container */
+    .shell {
+      max-width: 1500px;
+      margin: 0 auto;
+      background: var(--card);
+      border-radius: 14px;
+      padding: 20px;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.04);
+    }
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .input,
+    .select {
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #fff;
+      min-width: 150px;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border-radius: 10px;
+      padding: 8px 14px;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-2);
+    }
+
+    .progress-summary {
+      background: var(--lane);
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .progress-summary small {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .board {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .lane {
+      flex: 1;
+      min-width: 300px;
+      max-width: 400px;
+      height: 640px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      overflow: auto;
+      background: var(--lane);
+      transition: all .12s ease;
+    }
+
+    .lane:nth-child(even) {
+      background: var(--lane-alt);
+    }
+
+    .card-task {
+      position: relative;
+      background: var(--card);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 14px;
+      border: 1px solid var(--border);
+      min-height: 72px;
+      cursor: grab;
+      transition: transform .12s ease, box-shadow .12s ease;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.03);
+    }
+
+    .card-task:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.06);
+    }
+
+    .card-task::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 6px;
+      border-radius: 10px 0 0 10px;
+    }
+
+    .card-task[data-priority="Low"]::before {
+      background: var(--low);
+    }
+
+    .card-task[data-priority="Medium"]::before {
+      background: var(--medium);
+    }
+
+    .card-task[data-priority="High"]::before {
+      background: var(--high);
+    }
+
+    .card-task.due-soon:not(.completed) {
+      background: var(--due-soon);
+    }
+
+    .card-task.due-today:not(.completed) {
+      background: var(--due-today);
+    }
+
+    .card-task.overdue:not(.completed) {
+      background: #fff6f6;
+    }
+
+    .card-task.completed {
+      background: #f3f8f5;
+      opacity: 0.95;
+      cursor: default;
+    }
+
+    .card-task.completed strong,
+    .card-task.completed small {
+      text-decoration: line-through;
+      opacity: 0.8;
+    }
+
+    .card-task strong {
+      display: block;
+      font-weight: 600;
+      color: #111;
+      font-size: 1rem;
+      margin-bottom: 6px;
+    }
+
+    .card-task small {
+      display: block;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .card-actions {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      display: flex;
+      gap: 6px;
+    }
+
+    .analytics {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 24px;
+    }
+
+    .chart-card {
+      width: 340px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #fff;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03);
+    }
+
+    .footer-note {
+      text-align: center;
+      color: var(--muted);
+      margin-top: 16px;
+      font-size: 0.9rem;
+    }
+  </style>
 </head>
 
 <body>
-  <!-- NAVBAR -->
-  <nav class="navbar navbar-expand-lg">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">
-        <i class="bi bi-kanban"></i>ToDo
-      </a>
-      <div class="d-flex justify-content-between">
-        <div></div>
-        <button class="btn btn-outline-primary" type="button" title="Add Task" data-bs-toggle="modal"
-          data-bs-target="#addUpdateTaskModal" id="btnAddTask">
-          <i class="bi bi-plus"></i> Add Task
-        </button>
+ <!-- Inside your <nav> ... keep everything else the same -->
+<nav class="navbar navbar-expand-lg navbar-custom fixed-top">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand" href="#"><i class="bi bi-journal-bookmark"></i> Study Planner</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="#">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Planner</a></li>
+        <li class="nav-item"><a class="nav-link active" href="#">Task Board</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Pomodoro</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Analytics</a></li>
+      </ul>
+
+      
+      <div class="dropdown">
+        <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+          data-bs-toggle="dropdown">
+          <img src="https://cdn-icons-png.flaticon.com/512/219/219983.png" class="avatar me-2" alt="User">
+          <span>Profile</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+          <li><a class="dropdown-item text-danger" href="#">Logout</a></li>
+        </ul>
       </div>
     </div>
-  </nav>
-  <!-- AddUpdate Task Modal -->
-  <div class="modal fade" id="addUpdateTaskModal" tabindex="-1" aria-labelledby="addUpdateTaskModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+  </div>
+</nav>
+
+  <!-- === HEADER === -->
+  <header>
+    <img src="https://cdn-icons-png.flaticon.com/512/4205/4205930.png" alt="Planner logo">
+    <h1>Study Planner — Task Board</h1>
+    <p>Organize tasks, priorities, and progress efficiently.</p>
+  </header>
+
+  <!-- === MAIN BOARD === -->
+  <div class="shell">
+    <div class="top-row">
+      <div class="controls">
+        <input id="quickTitle" class="input" placeholder="Quick add a task" maxlength="120">
+        <select id="quickLane" class="select">
+          <option value="backlog">Backlog</option>
+          <option value="todo" selected>To Do</option>
+          <option value="inProgress">In Progress</option>
+        </select>
+        <select id="quickPrio" class="select">
+          <option value="Medium" selected>Medium</option>
+          <option value="High">High</option>
+          <option value="Low">Low</option>
+        </select>
+        <button id="btnQuickAdd" class="btn-primary">Add Task</button>
+      </div>
+      <div class="controls">
+        <button id="btnOpenModal" class="btn btn-outline-primary btn-sm"><i class="bi bi-pencil-square"></i> Add / Edit</button>
+        <button id="btnClear" class="btn btn-outline-danger btn-sm">Clear All</button>
+      </div>
+    </div>
+
+    <div class="progress-summary">
+      <div class="d-flex justify-content-between">
+        <small><strong>Overall Progress</strong></small>
+        <small id="progressLabel">0% Completed</small>
+      </div>
+      <div class="progress mt-2" style="height:10px; background:#eef3f7; border-radius:8px;">
+        <div id="progressBar" class="progress-bar" role="progressbar"
+          style="width:0%; background:linear-gradient(90deg,var(--accent),var(--accent-2));"></div>
+      </div>
+    </div>
+
+    <div class="board" id="board">
+      <div class="lane" data-lane="backlog"><h5>Backlog</h5><div class="cards"></div></div>
+      <div class="lane" data-lane="todo"><h5>To Do</h5><div class="cards"></div></div>
+      <div class="lane" data-lane="inProgress"><h5>In Progress</h5><div class="cards"></div></div>
+      <div class="lane" data-lane="done"><h5>Done</h5><div class="cards"></div></div>
+    </div>
+
+   <div class="analytics">
+  <div class="chart-card">
+    <h6>Status Overview</h6>
+    <canvas id="chartStatus" width="280" height="160"></canvas>
+  </div>
+</div>
+
+
+    <div class="footer-note">Drag tasks through stages to visualize workflow. Completed tasks are locked.</div>
+  </div>
+
+  <!-- === MODAL === -->
+  <div class="modal fade" id="taskModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h2 class="modal-title fs-5" id="addUpdateTaskModalLabel">Add Task</h2>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <h5 id="modalTitle" class="modal-title">Add or Edit Task</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
-        <form id="addUpdateTaskForm">
-          <div class="modal-body">  
-              <input type="hidden" class="form-control" id="taskId">
-            <div class="mb-3">
-              <label for="taskTitle" class="form-label">Title</label>
-              <input type="text" class="form-control" id="taskTitle" placeholder="Enter Task Title">
-            </div>
-            <div class="mb-3">
-              <label for="taskDescription" class="form-label">Description</label>
-              <textarea class="form-control" id="taskDescription" placeholder="Enter Task Description"></textarea>
-            </div>
-            <div class="mb-3">
-              <label for="taskCategory" class="form-label">Category</label>
-              <select class="form-select" id="taskCategory">
-                <option>Personal</option>
-                <option>Work</option>
+        <form id="taskForm" class="modal-body">
+          <input type="hidden" id="taskId">
+          <div class="mb-2"><input id="title" class="form-control" placeholder="Task title" maxlength="120" required></div>
+          <div class="mb-2"><textarea id="description" class="form-control" rows="3"
+              placeholder="Description (optional)" maxlength="800"></textarea></div>
+          <div class="row g-2 mb-2">
+            <div class="col"><input id="due" type="date" class="form-control"></div>
+            <div class="col">
+              <select id="priority" class="form-select">
+                <option value="Medium" selected>Medium</option>
+                <option value="High">High</option>
+                <option value="Low">Low</option>
               </select>
             </div>
-            <div class="mb-3">
-              <label for="taskPriority" class="form-label">Priority</label>
-              <select class="form-select" id="taskPriority">
-                <option>Low</option>
-                <option>Medium</option>
-                <option>High</option>
+            <div class="col">
+              <select id="laneSel" class="form-select">
+                <option value="backlog">Backlog</option>
+                <option value="todo">To Do</option>
+                <option value="inProgress">In Progress</option>
+                <option value="done">Done</option>
               </select>
             </div>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary" id="btnAddUpdateTask">Add Task</button>
-          </div>
+          <div class="text-end"><button class="btn btn-success btn-sm" type="submit">Save Task</button></div>
         </form>
       </div>
     </div>
   </div>
-  <!-- Delete Modal -->
-   <div class="modal fade" id="deleteTaskModal" tabindex="-1" aria-labelledby="deleteTaskModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2 class="modal-title fs-5" id="deleteTaskModalLabel">Add Task</h2>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-          <div class="modal-body">  
-          <p>Are you sure you want to delete this task?</p>
-          <p class="small text-danger">Note: This is a permanent operation, you cannot rollback this later.</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-danger" id="btnDeleteTask">Delete Task</button>
-          </div>
-      </div>
-    </div>
-  </div>
-  <!-- BOARD -->
-  <div class="container-fluid">
-    <div class="row bg-light" id="kanban-board">
-      <div class="col-md-4">
-        <div class="kanban-lane bg-secondary-subtle" id="todoLane">
-          <div class="d-flex justify-content-between align-items-center">
-            <h4>Todo</h4>
-            <button type="button" class="btn btn-sm rounded-circle btn-outline-primary" id="btnAddTaskShortcut" data-bs-toggle="modal" data-bs-target="#addUpdateTaskModal" title="Add Task">
-              <i class="bi bi-plus"></i>
-            </button>
-          </div>
 
-          <div class="task-cards">
-          
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="kanban-lane bg-secondary-subtle" id="inProgressLane">
-          <h4>In Progress</h4>
-          <div class="task-cards"></div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="kanban-lane bg-secondary-subtle" id="doneLane">
-          <h4>Done</h4>
-          <div class="task-cards"></div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- === Bootstrap Bundle & Logic === -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    /* === FULL JS LOGIC (add/edit/delete/drag/drop/charts/validation) === */
+    const STORAGE_KEY = "study_planner_prof_v1";
+    const loadItems = () => JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    const saveItems = arr => localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+    const newId = () => Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+    const todayISO = () => new Date().toISOString().split("T")[0];
+    const escapeHtml = s => s ? s.replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m])) : "";
 
- <!-- TOAST -->
-    <div class="toast-container position-fixed top-0 end-0 p-3">
-      <div
-        id="messageToast"
-        class="toast"
-        role="alert"
-        aria-live="assertive"
-        aria-atomic="true"
-      >
-        <div class="toast-header">
-          <strong class="me-auto"
-            ><i class="bi bi-kanban"></i> Todo</strong
-          >
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="toast"
-            aria-label="Close"
-          ></button>
-        </div>
-        <div class="toast-body" id="messageToastBody">
-          Task <strong>Added</strong> Successfully to your list.
-        </div>
-      </div>
-    </div>
-    
-  <!-- BOOTSTRAP DEPENDENCIES -->
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js"
-    integrity="sha384-7qAoOXltbVP82dhxHAUje59V5r2YsVfBafyUDxEdApLPmcdhBPg1DKg1ERo0BZlK"
-    crossorigin="anonymous"></script>
+    document.addEventListener("DOMContentLoaded", () => {
+      renderBoard();
 
-  <!-- CUSTOM JS -->
-  <script src="./app.js"></script>
+      document.getElementById("btnQuickAdd").onclick = () => {
+        const title = quickTitle.value.trim(), lane = quickLane.value, prio = quickPrio.value;
+        if (!title) return alert("Enter a title.");
+        const arr = loadItems();
+        arr.push({ id: newId(), title, description: "", due: null, priority: prio, lane, completed: lane === "done" });
+        saveItems(arr); quickTitle.value = ""; renderBoard();
+      };
+
+      btnOpenModal.onclick = () => openModal();
+      btnClear.onclick = () => { if (confirm("Delete all tasks?")) { localStorage.removeItem(STORAGE_KEY); renderBoard(); } };
+      taskForm.onsubmit = e => {
+        e.preventDefault();
+        const id = taskId.value || newId();
+        const title = titleEl.value.trim();
+        if (!title) return alert("Title required.");
+        const due = dueEl.value, lane = laneSel.value;
+        const obj = { id, title, description: desc.value.trim(), due: due || null, priority: priority.value, lane, completed: lane === "done" };
+        const arr = loadItems(); const idx = arr.findIndex(x => x.id === id);
+        if (idx > -1) arr[idx] = obj; else arr.push(obj);
+        saveItems(arr); bootstrap.Modal.getInstance(taskModal).hide(); renderBoard();
+      };
+    });
+
+    function renderBoard() {
+      document.querySelectorAll(".lane .cards").forEach(c => c.innerHTML = "");
+      const items = loadItems();
+      const lanes = { backlog: [], todo: [], inProgress: [], done: [] };
+      items.forEach(t => lanes[t.lane].push(t));
+
+      Object.keys(lanes).forEach(l => {
+        const container = document.querySelector(`[data-lane="${l}"] .cards`);
+        if (!lanes[l].length) return container.innerHTML = `<div class='empty text-muted'>No tasks.</div>`;
+        lanes[l].forEach(t => {
+          const c = document.createElement("div");
+          c.className = "card-task";
+          c.dataset.id = t.id; c.dataset.priority = t.priority;
+          if (t.completed) c.classList.add("completed");
+          const actions = !t.completed ? `<div class="card-actions">
+              <button class="btn btn-sm btn-link text-muted editBtn"><i class="bi bi-pencil"></i></button>
+              <button class="btn btn-sm btn-link text-muted deleteBtn"><i class="bi bi-trash"></i></button>
+              <button class="btn btn-sm btn-link text-muted toggleBtn"><i class="bi bi-check2"></i></button></div>` : "";
+          c.innerHTML = `<strong>${escapeHtml(t.title)}</strong>${t.description ? `<small>${escapeHtml(t.description)}</small>` : ""}${t.due ? `<small>Due: ${t.due}</small>` : ""}${actions}`;
+          if (!t.completed) { c.draggable = true; c.addEventListener("dragstart", e => e.dataTransfer.setData("text/plain", t.id)); }
+          container.appendChild(c);
+        });
+      });
+
+      wireCardActions(); wireDropZones(); updateCharts();
+    }
+
+    function wireCardActions() {
+      document.querySelectorAll(".editBtn").forEach(b => b.onclick = () => openModal(b.closest(".card-task").dataset.id));
+      document.querySelectorAll(".deleteBtn").forEach(b => b.onclick = () => { if (confirm("Delete task?")) { saveItems(loadItems().filter(x => x.id !== b.closest(".card-task").dataset.id)); renderBoard(); } });
+      document.querySelectorAll(".toggleBtn").forEach(b => b.onclick = () => {
+        const id = b.closest(".card-task").dataset.id, arr = loadItems();
+        arr.forEach(a => { if (a.id === id) { a.completed = !a.completed; a.lane = a.completed ? "done" : "todo"; } });
+        saveItems(arr); renderBoard();
+      });
+    }
+
+    function wireDropZones() {
+      document.querySelectorAll(".lane").forEach(l => {
+        l.addEventListener("dragover", e => e.preventDefault());
+        l.addEventListener("drop", e => {
+          const id = e.dataTransfer.getData("text/plain"), arr = loadItems(), t = arr.find(x => x.id === id);
+          if (!t) return;
+          if (t.lane === "done") return alert("Cannot move completed tasks.");
+          t.lane = l.dataset.lane; if (t.lane === "done") t.completed = true;
+          saveItems(arr); renderBoard();
+        });
+      });
+    }
+
+    let chart1;
+function updateCharts() {
+  const arr = loadItems();
+  const done = arr.filter(t => t.lane === "done").length;
+  const total = arr.length || 1;
+  
+  // update progress bar
+  const pct = Math.round((done / total) * 100);
+  progressBar.style.width = pct + "%";
+  progressLabel.textContent = pct + "% Completed";
+  
+  // update status chart only
+  const ctx1 = document.getElementById("chartStatus").getContext("2d");
+  if (chart1) chart1.destroy();
+  chart1 = new Chart(ctx1, {
+    type: "doughnut",
+    data: {
+      labels: ["Backlog", "To Do", "In Progress", "Done"],
+      datasets: [{
+        data: ["backlog", "todo", "inProgress", "done"].map(l => arr.filter(t => t.lane === l).length),
+        backgroundColor: ["#b5beca", "#a7c4f2", "#f6d67c", "#7cbfa2"]
+      }]
+    },
+    options: { plugins: { legend: { position: "bottom" } } }
+  });
+}
+    function openModal(id) {
+      const modal = new bootstrap.Modal(document.getElementById("taskModal"));
+      taskForm.reset(); taskId.value = ""; document.getElementById("due").setAttribute("min", todayISO());
+      if (id) {
+        const t = loadItems().find(x => x.id === id);
+        if (!t) return; if (t.completed) return alert("Cannot edit completed task.");
+        taskId.value = t.id; title.value = t.title; description.value = t.description || ""; due.value = t.due || ""; priority.value = t.priority; laneSel.value = t.lane;
+      }
+      modal.show();
+    }
+  </script>
 </body>
-
 </html>
