@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyFlow</title>
+
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Boxicons -->
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --primary-color: #4EA685;
+  --secondary-color: #57B894;
+  --white: #ffffff;
+  --gray: #efefef;
+  --gray-2: #757575;
+}
+* { font-family: 'Poppins', sans-serif; margin:0; padding:0; box-sizing:border-box; }
+body { background-color: var(--gray); }
+
+.container { max-width: 400px; width:100%; margin:auto; padding-top:50px; }
+.form-card { padding:2rem; background:#fff; border-radius:1rem; box-shadow:0 5px 15px rgba(0,0,0,0.2); transition:0.5s; }
+.hidden { display:none; }
+.input-group { margin:1rem 0; }
+.input-group-text { background:#efefef; border:none; border-radius:.5rem 0 0 .5rem; color:#757575; font-size:1.2rem; }
+.form-control { background:#efefef; border:none; border-radius:0 .5rem .5rem 0; padding:.8rem; }
+button { width:100%; padding:.8rem; border:none; border-radius:.5rem; background:var(--primary-color); color:#fff; font-size:1rem; cursor:pointer; }
+button:hover { background:var(--secondary-color); }
+b.pointer { cursor:pointer; color:var(--primary-color); }
+#welcomeMsgAuth { font-size:1.5rem; font-weight:600; text-align:center; margin-bottom:1rem; }
+
+/* Dashboard Styles */
+.sidebar { width:220px; background: linear-gradient(180deg, #4EA685, #57B894); position: fixed; height:100%; color: var(--white); transition:0.3s; display:none; }
+.sidebar h2 { text-align:center; padding:1rem 0; font-weight:600; letter-spacing:1px; }
+.sidebar ul { list-style:none; padding:0; }
+.sidebar ul li { padding:15px 20px; cursor:pointer; display:flex; align-items:center; transition:0.3s; }
+.sidebar ul li i { margin-right:10px; font-size:1.2rem; }
+.sidebar ul li:hover, .sidebar ul li.active { background-color: rgba(255,255,255,0.15); border-radius:10px; }
+.main-content { margin-left:220px; padding:20px; display:none; }
+.navbar-custom { display:flex; justify-content:space-between; align-items:center; background:#fff; padding:10px 20px; border-radius:10px; margin-bottom:20px; box-shadow: rgba(0,0,0,0.1) 0px 5px 15px; }
+.card-custom { border-radius:15px; padding:20px; margin-bottom:20px; box-shadow: rgba(0,0,0,0.1) 0px 8px 20px; background:#fff; transition: transform 0.3s; }
+.card-custom:hover { transform: scale(1.05); }
+.hidden { display:none; }
+.sticky-note { width:200px; min-height:150px; padding:10px; margin:10px; background:#fffbea; border-radius:10px; box-shadow: rgba(0,0,0,0.1) 0px 6px 12px; animation: fadeIn 0.5s; }
+.notes-container { display:flex; flex-wrap:wrap; }
+.progress { height:10px; border-radius:5px; }
+@keyframes fadeIn { 0%{opacity:0;transform:translateY(-10px);}100%{opacity:1;transform:translateY(0);} }
+</style>
+</head>
+<body>
+
+<!-- AUTH FORMS -->
+<div class="container" id="authContainer">
+  <div id="welcomeMsgAuth">Welcome to StudyFlow!</div>
+
+  <!-- SIGNUP FORM -->
+  <form id="signupForm" class="form-card">
+    <h3 class="text-center">Sign Up</h3>
+    <div class="input-group">
+      <span class="input-group-text"><i class='bx bxs-user'></i></span>
+      <input type="text" id="signupName" class="form-control" placeholder="Name" required>
+    </div>
+    <div class="input-group">
+      <span class="input-group-text"><i class='bx bx-mail-send'></i></span>
+      <input type="email" id="signupEmail" class="form-control" placeholder="Email" required>
+    </div>
+    <div class="input-group">
+      <span class="input-group-text"><i class='bx bxs-lock-alt'></i></span>
+      <input type="password" id="signupPassword" class="form-control" placeholder="Password" required>
+    </div>
+    <div class="input-group">
+      <span class="input-group-text"><i class='bx bxs-lock-alt'></i></span>
+      <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm Password" required>
+    </div>
+    <button type="submit">Sign Up</button>
+    <p class="text-center mt-2">Already have an account? <b class="pointer" onclick="toggleForms()">Login</b></p>
+  </form>
+
+  <!-- LOGIN FORM -->
+  <form id="loginForm" class="form-card hidden">
+    <h3 class="text-center">Login</h3>
+    <div class="input-group">
+      <span class="input-group-text"><i class='bx bxs-user'></i></span>
+      <input type="email" id="loginEmail" class="form-control" placeholder="Email" required>
+    </div>
+    <div class="input-group">
+      <span class="input-group-text"><i class='bx bxs-lock-alt'></i></span>
+      <input type="password" id="loginPassword" class="form-control" placeholder="Password" required>
+    </div>
+    <button type="submit">Login</button>
+    <p class="text-center mt-2">Don't have an account? <b class="pointer" onclick="toggleForms()">Sign Up</b></p>
+  </form>
+</div>
+
+<!-- DASHBOARD -->
+<div class="sidebar" id="sidebar">
+    <h2>StudyFlow</h2>
+    <ul>
+        <li class="active" onclick="showSection('dashboard', this)"><i class='bx bxs-dashboard'></i> Dashboard</li>
+        <li onclick="showSection('tasks', this)"><i class='bx bxs-check-circle'></i> Tasks</li>
+        <li onclick="showSection('notes', this)"><i class='bx bxs-note'></i> Sticky Notes</li>
+        <li onclick="showSection('analytics', this)"><i class='bx bxs-bar-chart-alt-2'></i> Analytics</li>
+        <li onclick="logout()"><i class='bx bxs-log-out-circle'></i> Logout</li>
+    </ul>
+</div>
+
+<div class="main-content" id="dashboardContent">
+    <div class="navbar-custom">
+        <div id="welcomeMsgDashboard">Welcome!</div>
+        <div id="currentDate"></div>
+    </div>
+
+    <!-- Motivational Quote -->
+    <div class="card-custom" id="quoteCard">
+        <h5>Daily Motivation</h5>
+        <p id="dailyQuote">Loading...</p>
+    </div>
+
+    <!-- Dashboard Section -->
+    <div id="dashboard" class="section">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card-custom">
+                    <h5>Total Tasks</h5>
+                    <p id="totalTasks" style="font-size:1.5rem; font-weight:600;">0</p>
+                    <div class="progress">
+                        <div id="tasksProgress" class="progress-bar" role="progressbar" style="width:0%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card-custom">
+                    <h5>Completed Tasks</h5>
+                    <p id="completedTasks" style="font-size:1.5rem; font-weight:600;">0</p>
+                    <div class="progress">
+                        <div id="completedProgress" class="progress-bar bg-success" role="progressbar" style="width:0%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card-custom">
+                    <h5>Notes Count</h5>
+                    <p id="notesCount" style="font-size:1.5rem; font-weight:600;">0</p>
+                    <div class="progress">
+                        <div id="notesProgress" class="progress-bar bg-warning" role="progressbar" style="width:0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tasks Section -->
+    <div id="tasks" class="section hidden">
+        <h3>Tasks</h3>
+        <div class="card-custom">
+            <input type="text" id="taskTitle" placeholder="Task Title">
+            <button onclick="addTask()">Add Task</button>
+        </div>
+        <ul class="list-group mt-3" id="taskList"></ul>
+    </div>
+
+    <!-- Notes Section -->
+    <div id="notes" class="section hidden">
+        <h3>Sticky Notes</h3>
+        <div class="card-custom">
+            <textarea id="noteContent" placeholder="Write your note here..."></textarea>
+            <button onclick="addNote()">Add Note</button>
+        </div>
+        <div class="notes-container" id="notesContainer"></div>
+    </div>
+
+    <!-- Analytics Section -->
+    <div id="analytics" class="section hidden">
+        <h3>Analytics</h3>
+        <div class="card-custom">
+            <canvas id="tasksChart" height="150"></canvas>
+        </div>
+        <div class="card-custom">
+            <canvas id="notesChart" height="150"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// ------------------- AUTH -------------------
+function toggleForms(){
+  document.getElementById('signupForm').classList.toggle('hidden');
+  document.getElementById('loginForm').classList.toggle('hidden');
+}
+
+// SIGNUP
+document.getElementById('signupForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  const name = document.getElementById('signupName').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const pass = document.getElementById('signupPassword').value;
+  const confirm = document.getElementById('confirmPassword').value;
+  if(pass!==confirm){ alert("Passwords do not match!"); return; }
+
+  let users = JSON.parse(localStorage.getItem('sf_users')) || [];
+  if(users.find(u=>u.email===email)){ alert("User already exists!"); return; }
+
+  users.push({name,email,password:pass});
+  localStorage.setItem('sf_users', JSON.stringify(users));
+  alert("Signup successful! Please login.");
+  toggleForms();
+  e.target.reset();
+});
+
+// LOGIN
+document.getElementById('loginForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPassword').value;
+
+  let users = JSON.parse(localStorage.getItem('sf_users')) || [];
+  let user = users.find(u=>u.email===email && u.password===pass);
+  if(!user){ alert("Invalid credentials!"); return; }
+
+  localStorage.setItem('sf_currentUser', JSON.stringify(user));
+  showDashboard(user);
+});
+
+// ------------------- DASHBOARD -------------------
+function showDashboard(user){
+  document.getElementById('authContainer').style.display='none';
+  document.getElementById('sidebar').style.display='block';
+  document.getElementById('dashboardContent').style.display='block';
+  document.getElementById('welcomeMsgDashboard').innerText = `Welcome, ${user.name}!`;
+  loadQuote();
+  updateDate();
+  loadTasks();
+  loadNotes();
+}
+
+// ------------------- DATE -------------------
+function updateDate(){
+  document.getElementById('currentDate').innerText = new Date().toDateString();
+}
+
+// ------------------- MOTIVATIONAL QUOTE -------------------
+async function loadQuote(){
+  try{
+    const res = await fetch('https://api.quotable.io/random');
+    const data = await res.json();
+    document.getElementById('dailyQuote').innerText = `"${data.content}" — ${data.author}`;
+  } catch(err){
+    document.getElementById('dailyQuote').innerText = "Stay motivated and keep going!";
+  }
+}
+
+// ------------------- SECTIONS -------------------
+function showSection(id, elem){
+  document.querySelectorAll('.section').forEach(sec=>sec.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  document.querySelectorAll('.sidebar ul li').forEach(li=>li.classList.remove('active'));
+  elem.classList.add('active');
+}
+
+// ------------------- LOGOUT -------------------
+function logout(){
+  localStorage.removeItem('sf_currentUser');
+  location.reload();
+}
+
+// ------------------- TASKS -------------------
+let tasks = [];
+function loadTasks(){
+  const user = JSON.parse(localStorage.getItem('sf_currentUser'));
+  tasks = JSON.parse(localStorage.getItem(`sf_tasks_${user.email}`))||[];
+  renderTasks();
+  updateDashboardCounts();
+}
+function addTask(){
+  const title = document.getElementById('taskTitle').value.trim();
+  if(title==="") return;
+  const user = JSON.parse(localStorage.getItem('sf_currentUser'));
+  tasks.push({title, completed:false});
+  localStorage.setItem(`sf_tasks_${user.email}`, JSON.stringify(tasks));
+  document.getElementById('taskTitle').value='';
+  renderTasks();
+  updateDashboardCounts();
+}
+function renderTasks(){
+  const taskList = document.getElementById('taskList');
+  taskList.innerHTML='';
+  tasks.forEach((t,i)=>{
+    const li = document.createElement('li');
+    li.className='list-group-item d-flex justify-content-between align-items-center';
+    li.innerHTML=`<span>${t.title}</span><input type="checkbox" ${t.completed?'checked':''} onchange="toggleTask(${i})">`;
+    taskList.appendChild(li);
+  });
+}
+function toggleTask(i){
+  tasks[i].completed = !tasks[i].completed;
+  const user = JSON.parse(localStorage.getItem('sf_currentUser'));
+  localStorage.setItem(`sf_tasks_${user.email}`, JSON.stringify(tasks));
+  renderTasks();
+  updateDashboardCounts();
+}
+
+// ------------------- NOTES -------------------
+let notes = [];
+function loadNotes(){
+  const user = JSON.parse(localStorage.getItem('sf_currentUser'));
+  notes = JSON.parse(localStorage.getItem(`sf_notes_${user.email}`))||[];
+  renderNotes();
+  updateDashboardCounts();
+}
+function addNote(){
+  const content = document.getElementById('noteContent').value.trim();
+  if(content==="") return;
+  const user = JSON.parse(localStorage.getItem('sf_currentUser'));
+  notes.push({content});
+  localStorage.setItem(`sf_notes_${user.email}`, JSON.stringify(notes));
+  document.getElementById('noteContent').value='';
+  renderNotes();
+  updateDashboardCounts();
+}
+function renderNotes(){
+  const container = document.getElementById('notesContainer');
+  container.innerHTML='';
+  notes.forEach(n=>{
+    const div = document.createElement('div');
+    div.className='sticky-note';
+    div.innerText = n.content;
+    container.appendChild(div);
+  });
+}
+
+// ------------------- DASHBOARD COUNTS -------------------
+function updateDashboardCounts(){
+  const totalTasks = tasks.length;
+  const completedTasks = tasks.filter(t=>t.completed).length;
+  const notesCount = notes.length;
+  document.getElementById('totalTasks').innerText=totalTasks;
+  document.getElementById('completedTasks').innerText=completedTasks;
+  document.getElementById('notesCount').innerText=notesCount;
+  document.getElementById('tasksProgress').style.width=totalTasks?`${(totalTasks/10)*100}%`:'0%';
+  document.getElementById('completedProgress').style.width=totalTasks?`${(completedTasks/totalTasks)*100}%`:'0%';
+  document.getElementById('notesProgress').style.width=notesCount?`${(notesCount/10)*100}%`:'0%';
+}
+
+// ------------------- ANALYTICS -------------------
+function loadAnalytics(){
+  const ctxTasks = document.getElementById('tasksChart').getContext('2d');
+  new Chart(ctxTasks, {
+    type:'pie',
+    data:{
+      labels:['Completed','Pending'],
+      datasets:[{label:'Tasks', data:[tasks.filter(t=>t.completed).length,tasks.filter(t=>!t.completed).length], backgroundColor:['#57B894','#4EA685'] }]
+    }
+  });
+
+  const ctxNotes = document.getElementById('notesChart').getContext('2d');
+  new Chart(ctxNotes,{
+    type:'bar',
+    data:{
+      labels: notes.map((n,i)=>`Note ${i+1}`),
+      datasets:[{label:'Notes', data:notes.map(()=>1), backgroundColor:'#57B894'}]
+    },
+    options:{responsive:true, plugins:{legend:{display:false}}}
+  });
+}
+setInterval(loadAnalytics,2000); // refresh charts
+</script>
+
+</body>
+</html> 
