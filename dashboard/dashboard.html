@@ -1,378 +1,869 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>StudyFlow</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Focus Planner — StudyFlow</title>
 
-<!-- Bootstrap -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<!-- Boxicons -->
-<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- Google Font -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<style>
-:root {
-  --primary-color: #4EA685;
-  --secondary-color: #57B894;
-  --white: #ffffff;
-  --gray: #efefef;
-  --gray-2: #757575;
-}
-* { font-family: 'Poppins', sans-serif; margin:0; padding:0; box-sizing:border-box; }
-body { background-color: var(--gray); }
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 
-.container { max-width: 400px; width:100%; margin:auto; padding-top:50px; }
-.form-card { padding:2rem; background:#fff; border-radius:1rem; box-shadow:0 5px 15px rgba(0,0,0,0.2); transition:0.5s; }
-.hidden { display:none; }
-.input-group { margin:1rem 0; }
-.input-group-text { background:#efefef; border:none; border-radius:.5rem 0 0 .5rem; color:#757575; font-size:1.2rem; }
-.form-control { background:#efefef; border:none; border-radius:0 .5rem .5rem 0; padding:.8rem; }
-button { width:100%; padding:.8rem; border:none; border-radius:.5rem; background:var(--primary-color); color:#fff; font-size:1rem; cursor:pointer; }
-button:hover { background:var(--secondary-color); }
-b.pointer { cursor:pointer; color:var(--primary-color); }
-#welcomeMsgAuth { font-size:1.5rem; font-weight:600; text-align:center; margin-bottom:1rem; }
+  <style>
+    /* Theme variables (renamed from pastel for clarity) */
+    :root{
+      --bg: #f6f9fb;
+      --bg-2: #f2f6f8;
+      --card: #ffffff;
+      --text: #24303b;
+      --muted: #64707b;
+      --accent: #9ad3c7;   /* teal */
+      --accent-2: #ffd5c2; /* peach */
+      --accent-3: #c7d2ff; /* lavender */
+      --glass: rgba(255,255,255,0.6);
+      --border: rgba(36,48,59,0.06);
+      --success: #A8E6CF;
+      --warn: #FFD3B6;
+      --danger: #ff6b6b;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg, var(--bg), var(--bg-2));
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      min-height:100vh;
+      padding:18px;
+    }
 
-/* Dashboard Styles */
-.sidebar { width:220px; background: linear-gradient(180deg, #4EA685, #57B894); position: fixed; height:100%; color: var(--white); transition:0.3s; display:none; }
-.sidebar h2 { text-align:center; padding:1rem 0; font-weight:600; letter-spacing:1px; }
-.sidebar ul { list-style:none; padding:0; }
-.sidebar ul li { padding:15px 20px; cursor:pointer; display:flex; align-items:center; transition:0.3s; }
-.sidebar ul li i { margin-right:10px; font-size:1.2rem; }
-.sidebar ul li:hover, .sidebar ul li.active { background-color: rgba(255,255,255,0.15); border-radius:10px; }
-.main-content { margin-left:220px; padding:20px; display:none; }
-.navbar-custom { display:flex; justify-content:space-between; align-items:center; background:#fff; padding:10px 20px; border-radius:10px; margin-bottom:20px; box-shadow: rgba(0,0,0,0.1) 0px 5px 15px; }
-.card-custom { border-radius:15px; padding:20px; margin-bottom:20px; box-shadow: rgba(0,0,0,0.1) 0px 8px 20px; background:#fff; transition: transform 0.3s; }
-.card-custom:hover { transform: scale(1.05); }
-.hidden { display:none; }
-.sticky-note { width:200px; min-height:150px; padding:10px; margin:10px; background:#fffbea; border-radius:10px; box-shadow: rgba(0,0,0,0.1) 0px 6px 12px; animation: fadeIn 0.5s; }
-.notes-container { display:flex; flex-wrap:wrap; }
-.progress { height:10px; border-radius:5px; }
-@keyframes fadeIn { 0%{opacity:0;transform:translateY(-10px);}100%{opacity:1;transform:translateY(0);} }
-</style>
+    /* Container */
+    .container{max-width:1200px;margin:0 auto;padding:18px;}
+
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{
+      width:56px;height:56px;border-radius:12px;
+      background:linear-gradient(135deg,var(--accent),var(--accent-3));
+      display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;
+      box-shadow:0 8px 20px rgba(65,105,85,0.08);
+      font-family:monospace;
+      font-size:18px;
+    }
+    h1{margin:0;font-size:20px}
+    .subtitle{color:var(--muted);font-size:13px;margin-top:4px}
+
+    nav.topnav{display:flex;align-items:center;gap:8px;padding:8px;border-radius:999px;background:transparent}
+    nav.topnav a{color:var(--muted);text-decoration:none;padding:8px 12px;border-radius:8px;font-weight:600;font-size:14px}
+    nav.topnav a.active{color:var(--text);background:linear-gradient(90deg, rgba(154,211,199,0.25), rgba(199,210,255,0.15));box-shadow:0 6px 18px rgba(60,90,80,0.03)}
+
+    .layout{display:grid;grid-template-columns:320px 1fr;gap:20px}
+    .side{background:var(--card);padding:16px;border-radius:14px;border:1px solid var(--border);box-shadow:0 6px 18px rgba(40,50,60,0.03)}
+    .main{min-height:60vh}
+
+    .card{background:var(--card);padding:18px;border-radius:12px;border:1px solid var(--border);margin-bottom:16px;box-shadow:0 6px 18px rgba(40,50,60,0.02)}
+    .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .stat{padding:16px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.6), transparent);border:1px solid rgba(36,48,59,0.04)}
+    .stat h3{margin:0;font-size:13px}
+    .stat .big{font-size:22px;color:var(--text);font-weight:800;margin-top:6px}
+
+    /* Calendar */
+    .calendar{width:100%;background:transparent;padding:8px;border-radius:10px}
+    .cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+    .day{padding:10px;border-radius:10px;text-align:center;font-size:14px;color:var(--muted);background:transparent;cursor:pointer;transition:background 0.1s}
+    .day:hover{background:var(--bg-2)}
+    .day.dimmed{opacity:0.4;cursor:default;background:transparent!important;}
+    .day.today{background:linear-gradient(180deg,var(--accent),var(--accent-3));color:#fff;font-weight:700;box-shadow:0 6px 18px rgba(154,211,199,0.12)}
+    .day.has-event{position:relative}
+    .day.has-event::after{content:'';position:absolute;left:50%;transform:translateX(-50%);bottom:6px;width:8px;height:8px;border-radius:50%;background:var(--accent-2)}
+    .selected-outline{outline:3px solid rgba(154,211,199,0.36);border-radius:10px}
+    .weekday-label{padding:10px;text-align:center;font-size:12px;font-weight:600;color:var(--text)}
+
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+    input,textarea,select,button{font-family:inherit}
+    input,textarea,select{width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text)}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
+    .btn-primary{background:linear-gradient(90deg,var(--accent),var(--accent-3));color:#fff}
+    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+
+    .timer-large{font-size:44px;font-weight:800;color:var(--accent-2);text-align:center}
+    .tm-controls{display:flex;gap:12px;justify-content:center;margin-top:8px}
+
+    .chart-wrap{padding:12px;background:transparent;border-radius:10px;border:1px dashed rgba(36,48,59,0.03)}
+
+    footer{color:var(--muted);font-size:13px;margin-top:18px;text-align:center}
+
+    .badge{padding:6px 8px;border-radius:8px;background:linear-gradient(90deg, rgba(199,210,255,0.35), rgba(154,211,199,0.12));font-weight:700;color:var(--text);font-size:12px}
+
+    .events-list .event{padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.8), transparent);margin-bottom:8px;border:1px solid rgba(36,48,59,0.04)}
+    .trash{background:transparent;border:0;color:var(--danger);cursor:pointer;font-size:16px}
+
+    .quote{font-style:italic;color:var(--muted);font-size:14px;padding:8px;border-radius:8px;background:linear-gradient(90deg, rgba(199,210,255,0.12), rgba(154,211,199,0.06));margin-bottom:8px}
+
+    /* Login/Signup screen */
+    #login-view{
+      position:fixed;top:0;left:0;width:100%;height:100%;z-index:1000;
+      background:linear-gradient(180deg, var(--accent), var(--accent-3));
+      display:flex;align-items:center;justify-content:center;
+    }
+    #login-box{
+      background:var(--card);padding:30px;border-radius:16px;width:360px;
+      text-align:center;box-shadow:0 10px 30px rgba(40,50,60,0.1);
+    }
+    #login-box h2{margin-top:0;color:var(--text)}
+    #login-box input{margin-bottom:15px;text-align:center;}
+    #login-box .btn-primary{width:100%;margin-top:10px;}
+    .login-logo{
+      width:60px;height:60px;border-radius:12px;
+      background:linear-gradient(135deg,var(--accent),var(--accent-3));
+      display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:800;
+      font-family:monospace;font-size:20px;margin-bottom:15px;
+    }
+    
+
+    /* Responsive */
+    @media (max-width:1000px){
+      .layout{grid-template-columns:1fr; }
+      .stats-grid{grid-template-columns:repeat(2,1fr)}
+      .logo{width:48px;height:48px}
+      .brand h1{font-size:18px}
+    }
+    @media (max-width:600px){
+      .stats-grid{grid-template-columns:repeat(1,1fr)}
+      header{flex-direction:column;align-items:flex-start;gap:12px}
+      .tm-controls{flex-wrap:wrap}
+      body{padding:10px}
+    }
+  </style>
 </head>
 <body>
+    <div id="login-view">
+    <div id="login-box">
+      <div class="login-logo">SF</div>
+      <h2>Welcome to StudyFlow</h2>
+      <form id="login-form">
+        <label style="text-align:left;">Enter Your Name</label>
+        <input id="username-input" required placeholder="Pearl" />
+        <button class="btn btn-primary" type="submit">Start Planning</button>
+        <div style="color:var(--muted);font-size:12px;margin-top:15px;">No password needed. Data is stored locally.</div>
+      </form>
+    </div>
+  </div>
 
-<!-- AUTH FORMS -->
-<div class="container" id="authContainer">
-  <div id="welcomeMsgAuth">Welcome to StudyFlow!</div>
+    <div class="container" id="app" style="visibility: hidden;">
+    <header>
+      <div class="brand">
+        <div class="logo">SF</div>
+        <div>
+          <h1>StudyFlow — Focus Planner</h1>
+          <div class="subtitle">Spacious layout • Pomodoro • Date-specific tasks</div>
+        </div>
+      </div>
 
-  <!-- SIGNUP FORM -->
-  <form id="signupForm" class="form-card">
-    <h3 class="text-center">Sign Up</h3>
-    <div class="input-group">
-      <span class="input-group-text"><i class='bx bxs-user'></i></span>
-      <input type="text" id="signupName" class="form-control" placeholder="Name" required>
-    </div>
-    <div class="input-group">
-      <span class="input-group-text"><i class='bx bx-mail-send'></i></span>
-      <input type="email" id="signupEmail" class="form-control" placeholder="Email" required>
-    </div>
-    <div class="input-group">
-      <span class="input-group-text"><i class='bx bxs-lock-alt'></i></span>
-      <input type="password" id="signupPassword" class="form-control" placeholder="Password" required>
-    </div>
-    <div class="input-group">
-      <span class="input-group-text"><i class='bx bxs-lock-alt'></i></span>
-      <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm Password" required>
-    </div>
-    <button type="submit">Sign Up</button>
-    <p class="text-center mt-2">Already have an account? <b class="pointer" onclick="toggleForms()">Login</b></p>
-  </form>
+      <div style="display:flex;gap:12px;align-items:center;">
+        <nav class="topnav" id="nav">
+          <a href="#/" data-route="/" class="active">Dashboard</a>
+          <a href="#/planner" data-route="/planner">Daily Planner</a>
+          <a href="#/analytics" data-route="/analytics">Analytics</a>
+        </nav>
+        <div style="width:1px;height:36px;background:var(--border);border-radius:2px"></div>
+        <div style="text-align:right">
+          <div style="font-size:12px;color:var(--muted)">Signed in as</div>
+          <div style="font-weight:800" id="header-username">Pearl <span class="badge" style="margin-left:8px">Pro</span></div>
+        </div>
+      </div>
+    </header>
 
-  <!-- LOGIN FORM -->
-  <form id="loginForm" class="form-card hidden">
-    <h3 class="text-center">Login</h3>
-    <div class="input-group">
-      <span class="input-group-text"><i class='bx bxs-user'></i></span>
-      <input type="email" id="loginEmail" class="form-control" placeholder="Email" required>
-    </div>
-    <div class="input-group">
-      <span class="input-group-text"><i class='bx bxs-lock-alt'></i></span>
-      <input type="password" id="loginPassword" class="form-control" placeholder="Password" required>
-    </div>
-    <button type="submit">Login</button>
-    <p class="text-center mt-2">Don't have an account? <b class="pointer" onclick="toggleForms()">Sign Up</b></p>
-  </form>
-</div>
+    <div class="layout" style="margin-top:8px;">
+      <aside class="side">
+        <div class="card" style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-size:13px;color:var(--muted)">Welcome</div>
+              <div style="font-weight:800" id="sidebar-username">Pearl</div>
+            </div>
+            <div style="text-align:center;">
+              <div class="badge">PRO</div>
+            </div>
+          </div>
+        </div>
 
-<!-- DASHBOARD -->
-<div class="sidebar" id="sidebar">
-    <h2>StudyFlow</h2>
-    <ul>
-        <li class="active" onclick="showSection('dashboard', this)"><i class='bx bxs-dashboard'></i> Dashboard</li>
-        <li onclick="showSection('tasks', this)"><i class='bx bxs-check-circle'></i> Tasks</li>
-        <li onclick="showSection('notes', this)"><i class='bx bxs-note'></i> Sticky Notes</li>
-        <li onclick="showSection('analytics', this)"><i class='bx bxs-bar-chart-alt-2'></i> Analytics</li>
-        <li onclick="logout()"><i class='bx bxs-log-out-circle'></i> Logout</li>
-    </ul>
-</div>
+        <div class="card" style="margin-bottom:12px">
+          <h4 style="margin:0 0 12px 0">Today’s Quote</h4>
+          <div id="daily-quote" class="quote">Loading inspirational quote...</div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-primary" id="refresh-quote">Refresh</button>
+            <button class="btn btn-ghost" id="copy-quote">Copy</button>
+          </div>
+        </div>
 
-<div class="main-content" id="dashboardContent">
-    <div class="navbar-custom">
-        <div id="welcomeMsgDashboard">Welcome!</div>
-        <div id="currentDate"></div>
-    </div>
+        <div class="card" style="margin-bottom:12px">
+          <h4 style="margin-bottom:8px">Quick Actions</h4>
+          <button class="btn btn-primary" id="quick-add-event" style="width:100%;">+ Add Event</button>
+          <div style="height:10px"></div>
+          <button class="btn btn-ghost" id="quick-start" style="width:100%;">Start Pomodoro</button>
+        </div>
 
-    <!-- Motivational Quote -->
-    <div class="card-custom" id="quoteCard">
-        <h5>Daily Motivation</h5>
-        <p id="dailyQuote">Loading...</p>
-    </div>
+        <div class="card">
+          <h4 style="margin-bottom:8px">Mini Calendar</h4>
+          <div id="side-mini-calendar" class="calendar"></div>
+        </div>
+      </aside>
 
-    <!-- Dashboard Section -->
-    <div id="dashboard" class="section">
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card-custom">
-                    <h5>Total Tasks</h5>
-                    <p id="totalTasks" style="font-size:1.5rem; font-weight:600;">0</p>
-                    <div class="progress">
-                        <div id="tasksProgress" class="progress-bar" role="progressbar" style="width:0%"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card-custom">
-                    <h5>Completed Tasks</h5>
-                    <p id="completedTasks" style="font-size:1.5rem; font-weight:600;">0</p>
-                    <div class="progress">
-                        <div id="completedProgress" class="progress-bar bg-success" role="progressbar" style="width:0%"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card-custom">
-                    <h5>Notes Count</h5>
-                    <p id="notesCount" style="font-size:1.5rem; font-weight:600;">0</p>
-                    <div class="progress">
-                        <div id="notesProgress" class="progress-bar bg-warning" role="progressbar" style="width:0%"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+      <main class="main">
+                <section id="view-dashboard" class="view">
+          <div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+            <div>
+              <h2 style="margin:0" id="welcome-message">Welcome back, Pearl</h2>
+              <div class="subtitle">Focus on today's priorities</div>
+            </div>
+            <div style="text-align:right">
+              <div style="color:var(--muted);font-size:13px">Productivity Score</div>
+              <div style="font-weight:800;color:var(--text);font-size:20px" id="overview-productivity">0%</div>
+            </div>
+          </div>
 
-    <!-- Tasks Section -->
-    <div id="tasks" class="section hidden">
-        <h3>Tasks</h3>
-        <div class="card-custom">
-            <input type="text" id="taskTitle" placeholder="Task Title">
-            <button onclick="addTask()">Add Task</button>
-        </div>
-        <ul class="list-group mt-3" id="taskList"></ul>
-    </div>
+          <div class="card stats-grid" style="margin-top:12px;">
+            <div class="stat">
+              <div style="color:var(--muted)">Upcoming Tasks</div>
+              <div class="big" id="stat-tasks">0</div>
+              <div style="color:var(--muted);font-size:12px">events scheduled</div>
+            </div>
+            <div class="stat">
+              <div style="color:var(--muted)">Pomodoro Sessions</div>
+              <div class="big" id="stat-pomo">0</div>
+              <div style="color:var(--muted);font-size:12px">sessions completed this week</div>
+            </div>
+            <div class="stat">
+              <div style="color:var(--muted)">Time Focused</div>
+              <div class="big" id="stat-minutes">0m</div>
+              <div style="color:var(--muted);font-size:12px">total this week</div>
+            </div>
+          </div>
 
-    <!-- Notes Section -->
-    <div id="notes" class="section hidden">
-        <h3>Sticky Notes</h3>
-        <div class="card-custom">
-            <textarea id="noteContent" placeholder="Write your note here..."></textarea>
-            <button onclick="addNote()">Add Note</button>
-        </div>
-        <div class="notes-container" id="notesContainer"></div>
-    </div>
+          <div style="display:grid;grid-template-columns:1fr 420px;gap:14px;margin-top:14px;">
+            <div class="card">
+              <h3 style="margin-top:0;">Upcoming Events</h3>
+              <div id="upcoming-events" class="events-list"></div>
+              <div id="empty-upcoming" style="color:var(--muted);padding:12px">No upcoming events.</div>
+            </div>
 
-    <!-- Analytics Section -->
-    <div id="analytics" class="section hidden">
-        <h3>Analytics</h3>
-        <div class="card-custom">
-            <canvas id="tasksChart" height="150"></canvas>
-        </div>
-        <div class="card-custom">
-            <canvas id="notesChart" height="150"></canvas>
-        </div>
-    </div>
-</div>
+            <div class="card">
+              <h3 style="margin-top:0;">Pomodoro Timer</h3>
+              <div style="padding:18px 0;text-align:center;">
+                <div class="timer-large" id="timer-display">25:00</div>
+                <div class="tm-controls">
+                  <button class="btn btn-primary" id="tm-start">Start</button>
+                  <button class="btn btn-ghost" id="tm-reset">Reset</button>
+                </div>
+                <div style="margin-top:10px;color:var(--muted);font-size:13px">Total sessions: <span id="total-sessions">0</span></div>
+              </div>
+            </div>
+          </div>
+        </section>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+                <section id="view-planner" class="view" style="display:none;">
+          <div style="display:grid;grid-template-columns:1fr 420px;gap:12px;">
+            <div>
+              <div class="card">
+                <div class="cal-head">
+                  <div>
+                    <strong id="cal-month-year"></strong>
+                    <div style="color:var(--muted);font-size:13px">Click any date to add or view events</div>
+                  </div>
+                  <div style="display:flex;gap:8px;">
+                    <button class="btn btn-ghost" id="prev-month">&lt;</button>
+                    <button class="btn btn-ghost" id="next-month">&gt;</button>
+                  </div>
+                </div>
+                <div class="calendar" id="calendar-root">
+                  <div class="cal-grid" id="calendar-grid">
+                    <div class="weekday-label">Mon</div>
+                    <div class="weekday-label">Tue</div>
+                    <div class="weekday-label">Wed</div>
+                    <div class="weekday-label">Thu</div>
+                    <div class="weekday-label">Fri</div>
+                    <div class="weekday-label">Sat</div>
+                    <div class="weekday-label">Sun</div>
+                  </div>
+                </div>
+
+                <div class="selected-date" id="selected-date-label" style="margin-top:12px;color:var(--muted)">Selected: -</div>
+
+                <div style="margin-top:12px;" class="card">
+                  <h4 style="margin:0 0 10px 0">Add Event</h4>
+                  <form id="add-event-form">
+                    <label>Title</label>
+                    <input id="evt-title" required placeholder="e.g. Study Algorithms" />
+                    <label>Time</label>
+                    <input id="evt-time" type="time" />
+                    <label>Description</label>
+                    <textarea id="evt-desc" rows="3" placeholder="Short note (optional)"></textarea>
+                    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+                      <button class="btn btn-primary" type="submit">Add/Update Event</button>
+                      <button class="btn btn-ghost" type="button" id="clear-form">Clear Form</button>
+                      <button class="btn btn-ghost" type="button" id="goto-today">Go to Today</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="card">
+                <h4 style="margin-top:0">Events for selected date</h4>
+                <div id="events-for-day" class="events-list"></div>
+                <div id="no-events-day" style="color:var(--muted);padding:12px">No events for this date.</div>
+              </div>
+
+              <div class="card" style="margin-top:12px;">
+                <h4 style="margin-top:0">Mini Pomodoro</h4>
+                <div style="text-align:center;padding:12px;">
+                  <div id="mini-timer" style="font-weight:800;font-size:20px;color:var(--accent-2)">25:00</div>
+                  <div style="margin-top:8px;">
+                    <button class="btn btn-primary" id="mini-start">Start</button>
+                    <button class="btn btn-ghost" id="mini-reset">Reset</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+                <section id="view-analytics" class="view" style="display:none;">
+          <div class="card chart-wrap">
+            <h3 style="margin-top:0">Weekly Study Time (minutes)</h3>
+            <canvas id="chart-line" height="100"></canvas>
+          </div>
+
+          <div class="card chart-wrap" style="margin-top:12px;">
+            <h3 style="margin-top:0">Event & Session Distribution (Last 7 Days)</h3>
+            <canvas id="chart-donut" height="100"></canvas>
+            <div style="text-align:center;color:var(--muted);font-size:13px;margin-top:10px;">Planned = Events Scheduled • Focused = Pomodoro Sessions Completed</div>
+          </div>
+
+          <div class="card" style="margin-top:12px;">
+            <h3 style="margin-top:0">Productivity Metrics</h3>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px">
+              <div style="flex:1 1 200px;padding:12px;border-radius:8px;background:linear-gradient(90deg, rgba(154,211,199,0.12), rgba(199,210,255,0.06))">Sessions this week: <strong id="stat-week-sessions">0</strong></div>
+              <div style="flex:1 1 200px;padding:12px;border-radius:8px;background:linear-gradient(90deg, rgba(255,211,193,0.08), rgba(199,210,255,0.04))">Avg focus/day: <strong id="stat-avg-day">0m</strong></div>
+            </div>
+          </div>
+        </section>
+
+        <footer>Built with ♥ — Focus on what matters. Data is stored locally in your browser.</footer>
+      </main>
+    </div>
+  </div>
 
 <script>
-// ------------------- AUTH -------------------
-function toggleForms(){
-  document.getElementById('signupForm').classList.toggle('hidden');
-  document.getElementById('loginForm').classList.toggle('hidden');
-}
+/* ---------------------------
+  Constants & Storage Keys
+----------------------------*/
+const STORE_EVENTS_KEY = 'sf_events_v1';
+const STORE_POMO_KEY = 'sf_pomo_v1';
+const STORE_MINUTES_KEY = 'sf_weekly_minutes_v1';
+const STORE_USER_KEY = 'sf_user_v1';
 
-// SIGNUP
-document.getElementById('signupForm').addEventListener('submit', e=>{
-  e.preventDefault();
-  const name = document.getElementById('signupName').value.trim();
-  const email = document.getElementById('signupEmail').value.trim();
-  const pass = document.getElementById('signupPassword').value;
-  const confirm = document.getElementById('confirmPassword').value;
-  if(pass!==confirm){ alert("Passwords do not match!"); return; }
+function loadEvents(){ try{ return JSON.parse(localStorage.getItem(STORE_EVENTS_KEY) || '[]'); }catch(e){return []} }
+function saveEvents(events){ localStorage.setItem(STORE_EVENTS_KEY, JSON.stringify(events)); }
+function loadPomo(){ try{ return JSON.parse(localStorage.getItem(STORE_POMO_KEY) || '{}'); }catch(e){return {} } }
+function savePomo(state){ localStorage.setItem(STORE_POMO_KEY, JSON.stringify(state)); }
+function loadUser(){ return localStorage.getItem(STORE_USER_KEY); }
+function saveUser(name){ localStorage.setItem(STORE_USER_KEY, name); }
 
-  let users = JSON.parse(localStorage.getItem('sf_users')) || [];
-  if(users.find(u=>u.email===email)){ alert("User already exists!"); return; }
 
-  users.push({name,email,password:pass});
-  localStorage.setItem('sf_users', JSON.stringify(users));
-  alert("Signup successful! Please login.");
-  toggleForms();
-  e.target.reset();
+/* ---------------------------
+  Authentication / Initial Load
+----------------------------*/
+document.getElementById('login-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const username = document.getElementById('username-input').value.trim();
+  if (username) {
+    saveUser(username);
+    initApp(username);
+  }
 });
 
-// LOGIN
-document.getElementById('loginForm').addEventListener('submit', e=>{
-  e.preventDefault();
-  const email = document.getElementById('loginEmail').value.trim();
-  const pass = document.getElementById('loginPassword').value;
+function initApp(username) {
+  // Update all username placeholders
+  const capitalizedUsername = username.charAt(0).toUpperCase() + username.slice(1);
+  document.getElementById('header-username').innerHTML = capitalizedUsername + ' <span class="badge" style="margin-left:8px">Pro</span>';
+  document.getElementById('sidebar-username').textContent = capitalizedUsername;
+  document.getElementById('welcome-message').textContent = `Welcome back, ${capitalizedUsername}`;
 
-  let users = JSON.parse(localStorage.getItem('sf_users')) || [];
-  let user = users.find(u=>u.email===email && u.password===pass);
-  if(!user){ alert("Invalid credentials!"); return; }
+  // Hide login and show main app
+  document.getElementById('login-view').style.display = 'none';
+  document.getElementById('app').style.visibility = 'visible';
 
-  localStorage.setItem('sf_currentUser', JSON.stringify(user));
-  showDashboard(user);
+  // Initialize main components
+  onHashChange();
+  fetchQuote();
+  renderCalendar();
+  renderEventsForDay();
+  refreshOverview();
+  initCharts();
+}
+
+// Check for existing user on load
+const storedUser = loadUser();
+if (storedUser) {
+  initApp(storedUser);
+} else {
+  document.getElementById('app').style.visibility = 'hidden';
+}
+
+/* ---------------------------
+  Simple SPA routing (hash)
+----------------------------*/
+function setActiveRoute(path){
+  document.querySelectorAll('#nav a').forEach(a=>{
+    a.classList.toggle('active', a.getAttribute('href') === '#'+path);
+  });
+  document.querySelectorAll('.view').forEach(v=> v.style.display='none');
+  if(path === '/') document.getElementById('view-dashboard').style.display='block';
+  if(path === '/planner') document.getElementById('view-planner').style.display='block';
+  if(path === '/analytics') document.getElementById('view-analytics').style.display='block';
+  // Ensure charts update when entering the analytics view
+  if(path === '/analytics') updateCharts();
+}
+function onHashChange(){
+  const path = location.hash.replace('#','') || '/';
+  setActiveRoute(path);
+}
+window.addEventListener('hashchange', onHashChange);
+
+/* ---------------------------
+  Date Utilities
+----------------------------*/
+let today = new Date();
+let viewYear = today.getFullYear();
+let viewMonth = today.getMonth(); // 0-index
+let selectedDate = formatDateISO(today);
+
+function formatDateISO(d){ // accept Date or string
+  const D = (typeof d === 'string')? new Date(d): d;
+  const y = D.getFullYear(), m = String(D.getMonth()+1).padStart(2,'0'), dt = String(D.getDate()).padStart(2,'0');
+  return y+'-'+m+'-'+dt;
+}
+function startOfDay(d){ const x = new Date(d); x.setHours(0,0,0,0); return x; }
+
+/* ---------------------------
+  Calendar rendering (FIXED: Monday Start)
+----------------------------*/
+const calendarGrid = document.getElementById('calendar-grid');
+const calMonthYear = document.getElementById('cal-month-year');
+const selectedLabel = document.getElementById('selected-date-label');
+
+function renderCalendar(){
+  // Clear existing days, keep weekday headers
+  while (calendarGrid.children.length > 7) {
+    calendarGrid.removeChild(calendarGrid.lastChild);
+  }
+
+  calMonthYear.textContent = new Date(viewYear, viewMonth).toLocaleString(undefined,{month:'long',year:'numeric'});
+  const first = new Date(viewYear, viewMonth, 1);
+  // Calculate start day (0=Mon, 6=Sun) - FIX: (getDay() + 6) % 7 converts Sun=0 to Mon=6
+  const startDay = (first.getDay() === 0) ? 6 : first.getDay() - 1; 
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const events = loadEvents();
+
+  // Fill empty slots
+  for(let i = 0; i < startDay; i++){
+    const el = document.createElement('div'); el.className='day dimmed'; el.textContent=''; calendarGrid.appendChild(el);
+  }
+
+  // Render days
+  for(let d = 1; d <= daysInMonth; d++){
+    const dt = new Date(viewYear, viewMonth, d);
+    const iso = formatDateISO(dt);
+    const el = document.createElement('div');
+    el.className='day';
+    el.textContent=d;
+    
+    if(formatDateISO(today) === iso) el.classList.add('today');
+    if(events.some(e=> e.date===iso)) el.classList.add('has-event');
+    if(selectedDate === iso) el.classList.add('selected-outline');
+    
+    el.addEventListener('click', ()=>{ 
+      selectedDate = iso; 
+      selectedLabel.textContent = 'Selected: '+iso; 
+      renderEventsForDay(); 
+      renderCalendar(); // Re-render to update selected outline
+      location.hash='/planner'; 
+    });
+    calendarGrid.appendChild(el);
+  }
+}
+
+document.getElementById('prev-month').addEventListener('click', ()=>{ viewMonth--; if(viewMonth<0){viewMonth=11; viewYear--} renderCalendar();});
+document.getElementById('next-month').addEventListener('click', ()=>{ viewMonth++; if(viewMonth>11){viewMonth=0; viewYear++} renderCalendar();});
+document.getElementById('goto-today').addEventListener('click', ()=>{ viewMonth = today.getMonth(); viewYear = today.getFullYear(); selectedDate = formatDateISO(today); selectedLabel.textContent = 'Selected: ' + selectedDate; renderCalendar(); renderEventsForDay(); });
+
+selectedLabel.textContent = 'Selected: '+selectedDate;
+
+/* ---------------------------
+  Events UI
+----------------------------*/
+const addForm = document.getElementById('add-event-form');
+addForm.addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const title = document.getElementById('evt-title').value.trim();
+  const time = document.getElementById('evt-time').value;
+  const desc = document.getElementById('evt-desc').value.trim();
+  if(!title) return alert('Please add a title');
+  let events = loadEvents();
+
+  // Check if the form is being used for editing (if an event was removed before form fill)
+  // For simplicity, we assume 'edit' means pre-filling and then submitting a new event after deleting the old one (see edit-btn logic)
+  // Otherwise, this always adds a new event.
+  
+  events.push({id:Date.now(), date:selectedDate, title, time, desc});
+  saveEvents(events);
+  addForm.reset();
+  renderCalendar();
+  renderEventsForDay();
+  refreshOverview();
+});
+document.getElementById('clear-form').addEventListener('click', ()=> addForm.reset());
+
+function renderEventsForDay(){
+  const list = document.getElementById('events-for-day');
+  const noEv = document.getElementById('no-events-day');
+  list.innerHTML = '';
+  const events = loadEvents().filter(ev=> ev.date === selectedDate).sort((a,b)=> (a.time||'') > (b.time||'')?1:-1);
+  if(events.length===0){ noEv.style.display='block'; } else { noEv.style.display='none'; }
+  events.forEach(ev=>{
+    const el = document.createElement('div'); el.className='event';
+    el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+                      <div style="flex:1;">
+                        <div style="font-weight:800">${escapeHtml(ev.title)}</div>
+                        <div style="color:var(--muted);font-size:13px;margin-top:6px">${ev.time || 'All Day'}</div>
+                        ${ev.desc?'<div style="color:var(--muted);font-size:13px;margin-top:8px">'+escapeHtml(ev.desc)+'</div>':''}
+                      </div>
+                      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+                        <button class="trash" data-id="${ev.id}" title="Delete">🗑</button>
+                        <button class="btn btn-ghost edit-btn" data-id="${ev.id}" style="padding:6px 8px;font-weight:600">Edit</button>
+                      </div>
+                    </div>`;
+    list.appendChild(el);
+  });
+  // delete handlers
+  list.querySelectorAll('.trash').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = Number(btn.dataset.id);
+      const all = loadEvents().filter(x=> x.id !== id);
+      saveEvents(all);
+      renderCalendar(); renderEventsForDay(); refreshOverview();
+    });
+  });
+  // edit handlers (simple inline edit: delete old, pre-fill form for new)
+  list.querySelectorAll('.edit-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = Number(btn.dataset.id);
+      const ev = loadEvents().find(x=> x.id === id);
+      if(!ev) return;
+      // 1. Populate form
+      document.getElementById('evt-title').value = ev.title;
+      document.getElementById('evt-time').value = ev.time || '';
+      document.getElementById('evt-desc').value = ev.desc || '';
+      // 2. Remove existing event (so form submission creates an updated one)
+      const remaining = loadEvents().filter(x=> x.id !== id);
+      saveEvents(remaining);
+      renderCalendar(); // update mark on calendar
+      renderEventsForDay(); // update day list
+      refreshOverview();
+      document.getElementById('evt-title').focus();
+    });
+  });
+  renderUpcoming();
+}
+
+function renderUpcoming(){
+  const up = document.getElementById('upcoming-events');
+  const empty = document.getElementById('empty-upcoming');
+  up.innerHTML='';
+  // Filter for upcoming events, sort by date/time
+  const now = new Date();
+  const events = loadEvents().filter(e=> {
+    const eventDate = new Date(e.date + (e.time ? `T${e.time}:00` : 'T00:00:00'));
+    return eventDate >= now;
+  }).sort((a,b)=> {
+    const dateA = new Date(a.date + (a.time ? `T${a.time}:00` : 'T00:00:00'));
+    const dateB = new Date(b.date + (b.time ? `T${b.time}:00` : 'T00:00:00'));
+    return dateA - dateB;
+  });
+  
+  if(events.length===0){ empty.style.display='block'; } else { empty.style.display='none'; }
+  events.slice(0,6).forEach(ev=>{
+    const el = document.createElement('div'); el.className='event';
+    el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+                      <div>
+                        <div style="font-weight:800">${escapeHtml(ev.title)}</div>
+                        <div style="color:var(--muted);font-size:13px">${ev.date} ${ev.time || 'All Day'}</div>
+                      </div>
+                      <div>
+                        <button class="trash" data-id="${ev.id}" title="Delete">🗑</button>
+                      </div>
+                    </div>`;
+    up.appendChild(el);
+  });
+  // delete handlers in upcoming
+  up.querySelectorAll('.trash').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = Number(btn.dataset.id);
+      const all = loadEvents().filter(x=> x.id !== id);
+      saveEvents(all);
+      renderCalendar(); renderEventsForDay(); refreshOverview();
+    });
+  });
+}
+
+/* quick add */
+document.getElementById('quick-add-event').addEventListener('click', ()=>{
+  location.hash = '/planner';
+  selectedDate = formatDateISO(new Date());
+  selectedLabel.textContent = 'Selected: ' + selectedDate;
+  renderEventsForDay();
+  renderCalendar();
+  setTimeout(()=> document.getElementById('evt-title').focus(), 200);
 });
 
-// ------------------- DASHBOARD -------------------
-function showDashboard(user){
-  document.getElementById('authContainer').style.display='none';
-  document.getElementById('sidebar').style.display='block';
-  document.getElementById('dashboardContent').style.display='block';
-  document.getElementById('welcomeMsgDashboard').innerText = `Welcome, ${user.name}!`;
-  loadQuote();
-  updateDate();
-  loadTasks();
-  loadNotes();
+/* ---------------------------
+  Pomodoro timer (global + mini)
+----------------------------*/
+const TM_DEFAULT = {minutes:25, seconds:0, running:false, sessions: 0, sessions_week: 0, last_week_reset: formatDateISO(new Date())};
+let pomState = {...TM_DEFAULT, ...loadPomo()};
+
+// Weekly reset logic (Fix: ensures weekly session count is accurate)
+function checkWeeklyReset(){
+  const todayKey = formatDateISO(new Date());
+  const lastReset = pomState.last_week_reset;
+  const dToday = new Date(todayKey);
+  const dLast = new Date(lastReset);
+  // Find the start of the current week (Monday)
+  const currentWeekStart = new Date(dToday);
+  currentWeekStart.setDate(dToday.getDate() - (dToday.getDay() === 0 ? 6 : dToday.getDay() - 1));
+  
+  // Check if the last reset was before the start of the current week
+  if (dLast < startOfDay(currentWeekStart)) {
+    pomState.sessions_week = 0;
+    pomState.last_week_reset = todayKey;
+    savePomo(pomState);
+  }
+}
+checkWeeklyReset();
+
+updateTimerUI();
+
+let timerInterval = null;
+function startTimer(isMini=false){
+  if(pomState.running) return;
+  
+  pomState.running = true;
+  pomState.lastStarted = Date.now();
+  savePomo(pomState);
+  
+  updateTimerUI(isMini);
+  
+  timerInterval = setInterval(()=> {
+    if(pomState.seconds === 0){
+      if(pomState.minutes === 0){
+        // SESSION COMPLETE
+        pomState.running = false;
+        pomState.sessions = (pomState.sessions || 0) + 1; // total sessions
+        pomState.sessions_week = (pomState.sessions_week || 0) + 1; // weekly sessions
+        addStudyMinutesForToday(25);
+        clearInterval(timerInterval);
+        timerInterval = null;
+        pomState.minutes = 25; pomState.seconds = 0;
+        savePomo(pomState);
+        refreshOverview();
+        updateTimerUI();
+        // small notification
+        try{ new Notification && new Notification('Pomodoro complete! Time for a break.'); }catch(e){}
+        return;
+      } else {
+        pomState.minutes -= 1;
+        pomState.seconds = 59;
+      }
+    } else {
+      pomState.seconds -= 1;
+    }
+    savePomo(pomState);
+    updateTimerUI();
+  }, 1000);
+}
+function resetTimer(){
+  pomState.running = false;
+  pomState.minutes = 25; pomState.seconds = 0;
+  savePomo(pomState);
+  if(timerInterval) clearInterval(timerInterval);
+  timerInterval = null;
+  updateTimerUI();
+}
+function updateTimerUI(){
+  const mm = String(pomState.minutes).padStart(2,'0');
+  const ss = String(pomState.seconds).padStart(2,'0');
+  document.getElementById('timer-display').textContent = mm+':'+ss;
+  document.getElementById('total-sessions').textContent = pomState.sessions || 0;
+  // Update both stats fields
+  document.getElementById('stat-pomo').textContent = pomState.sessions_week || 0;
+  document.getElementById('stat-week-sessions').textContent = pomState.sessions_week || 0;
+  document.getElementById('mini-timer').textContent = mm+':'+ss;
+}
+document.getElementById('tm-start').addEventListener('click', ()=> { startTimer(); });
+document.getElementById('tm-reset').addEventListener('click', ()=> { resetTimer(); });
+
+/* mini timer (uses main timer state) */
+document.getElementById('mini-start').addEventListener('click', ()=> { startTimer(true); });
+document.getElementById('mini-reset').addEventListener('click', ()=> { resetTimer(); });
+document.getElementById('quick-start').addEventListener('click', ()=>{ startTimer(); location.hash='/planner'; });
+
+/* ---------------------------
+  Weekly minutes (analytics)
+----------------------------*/
+function addStudyMinutesForToday(mins){
+  const raw = JSON.parse(localStorage.getItem(STORE_MINUTES_KEY) || '{}');
+  const todayKey = formatDateISO(new Date());
+  raw[todayKey] = (raw[todayKey]||0) + (mins||0);
+  localStorage.setItem(STORE_MINUTES_KEY, JSON.stringify(raw));
+  updateCharts();
+}
+function getWeeklyMinutes(){
+  const raw = JSON.parse(localStorage.getItem(STORE_MINUTES_KEY) || '{}');
+  const out = [];
+  const now = new Date();
+  
+  for(let i=6;i>=0;i--){
+    const d = new Date(now); d.setDate(now.getDate() - i);
+    const k = formatDateISO(d);
+    out.push({date:k, minutes: raw[k] || 0});
+  }
+  return out;
 }
 
-// ------------------- DATE -------------------
-function updateDate(){
-  document.getElementById('currentDate').innerText = new Date().toDateString();
+/* ---------------------------
+  Charts (Chart.js) - FIXED: Improved logic & labels
+----------------------------*/
+let lineChart = null, donutChart = null;
+function initCharts(){
+  const ctxLine = document.getElementById('chart-line').getContext('2d');
+  const ctxDonut = document.getElementById('chart-donut').getContext('2d');
+  
+  // Line Chart
+  lineChart = new Chart(ctxLine, {
+    type:'line',
+    data:{labels:[],datasets:[{label:'Minutes',data:[],tension:0.3,fill:true,backgroundColor:'rgba(154,211,199,0.25)',borderColor:'rgba(154,211,199,0.9)',pointRadius:4}]},
+    options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true, title:{display:true, text:'Minutes'}}}}
+  });
+  
+  // Doughnut Chart (FIXED: Comparison between scheduled events and completed sessions)
+  donutChart = new Chart(ctxDonut, {
+    type:'doughnut',
+    data:{labels:['Planned Events','Focused Sessions'],datasets:[{data:[0,1],backgroundColor:['rgba(199,210,255,0.9)','rgba(255,213,182,0.9)']}]},
+    options:{
+      plugins:{
+        legend:{position:'bottom'},
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              let label = context.label || '';
+              if (label) { label += ': ';}
+              label += context.raw;
+              return label;
+            }
+          }
+        }
+      }
+    }
+  });
+  updateCharts();
 }
 
-// ------------------- MOTIVATIONAL QUOTE -------------------
-async function loadQuote(){
-  try{
-    const res = await fetch('https://api.quotable.io/random');
-    const data = await res.json();
-    document.getElementById('dailyQuote').innerText = `"${data.content}" — ${data.author}`;
-  } catch(err){
-    document.getElementById('dailyQuote').innerText = "Stay motivated and keep going!";
-  }
+function updateCharts(){
+  const wk = getWeeklyMinutes();
+  
+  // 1. Line Chart Data
+  const labels = wk.map(x=> new Date(x.date).toLocaleDateString(undefined,{weekday:'short'}));
+  const data = wk.map(x=> x.minutes);
+  if(lineChart){
+    lineChart.data.labels = labels;
+    lineChart.data.datasets[0].data = data;
+    lineChart.update();
+  }
+  
+  // 2. Donut Chart Data (FIXED: Using counts for meaningful comparison)
+  const events = loadEvents();
+  const weekStart = startOfDay(new Date(new Date().setDate(new Date().getDate()-6)));
+  // Count scheduled events this week (or since start of week for better relevance)
+  const plannedEvents = events.filter(e=> new Date(e.date) >= weekStart).length;
+  // Count completed Pomodoro sessions this week (already tracked in pomState.sessions_week)
+  const focusedSessions = pomState.sessions_week || 0;
+  
+  if(donutChart){
+    // Ensure a total of at least 1 for the chart to render
+    const total = plannedEvents + focusedSessions;
+    donutChart.data.datasets[0].data = [plannedEvents, focusedSessions];
+    donutChart.update();
+  }
+  
+  // 3. Update Quick Stats
+  const minutesTotal = wk.reduce((a,b)=>a+b.minutes,0);
+  document.getElementById('stat-minutes').textContent = minutesTotal + 'm';
+  document.getElementById('stat-week-sessions').textContent = focusedSessions;
+  document.getElementById('stat-avg-day').textContent = Math.round(minutesTotal/7) + 'm';
 }
 
-// ------------------- SECTIONS -------------------
-function showSection(id, elem){
-  document.querySelectorAll('.section').forEach(sec=>sec.classList.add('hidden'));
-  document.getElementById(id).classList.remove('hidden');
-  document.querySelectorAll('.sidebar ul li').forEach(li=>li.classList.remove('active'));
-  elem.classList.add('active');
+/* ---------------------------
+  Overview refresh (counts)
+----------------------------*/
+function refreshOverview(){
+  const events = loadEvents();
+  // Upcoming tasks (total events in the future)
+  const upcomingTasks = events.filter(e => new Date(e.date + (e.time ? `T${e.time}:00` : 'T00:00:00')) >= new Date()).length;
+  document.getElementById('stat-tasks').textContent = upcomingTasks;
+  document.getElementById('stat-pomo').textContent = pomState.sessions_week || 0;
+  updateTimerUI();
+  
+  // Productivity: Ratio of sessions to upcoming tasks (simple metric)
+  const productivity = Math.round(((pomState.sessions_week || 0) / (upcomingTasks > 0 ? upcomingTasks : 1)) * 100);
+  document.getElementById('overview-productivity').textContent = Math.min(100, productivity) + '%';
+  
+  renderUpcoming();
+  updateCharts();
 }
 
-// ------------------- LOGOUT -------------------
-function logout(){
-  localStorage.removeItem('sf_currentUser');
-  location.reload();
-}
+/* ---------------------------
+  Utility helpers
+----------------------------*/
+function escapeHtml(s){ return String(s || '').replace(/[&<>"']/g, c=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]) ); }
 
-// ------------------- TASKS -------------------
-let tasks = [];
-function loadTasks(){
-  const user = JSON.parse(localStorage.getItem('sf_currentUser'));
-  tasks = JSON.parse(localStorage.getItem(`sf_tasks_${user.email}`))||[];
-  renderTasks();
-  updateDashboardCounts();
+/* ---------------------------
+  Daily quote (fetch API)
+----------------------------*/
+const QUOTE_EL = document.getElementById('daily-quote');
+async function fetchQuote(){
+  const fallback = {content: "Keep going — progress is progress, no matter how small.", author: "Unknown"};
+  try{
+    const res = await fetch('https://api.quotable.io/random?tags=technology|inspirational|wisdom');
+    if(!res.ok) throw new Error('quote fetch failed');
+    const data = await res.json();
+    QUOTE_EL.textContent = `“${data.content}” — ${data.author || 'Unknown'}`;
+  } catch(e){
+    QUOTE_EL.textContent = `“${fallback.content}” — ${fallback.author}`;
+  }
 }
-function addTask(){
-  const title = document.getElementById('taskTitle').value.trim();
-  if(title==="") return;
-  const user = JSON.parse(localStorage.getItem('sf_currentUser'));
-  tasks.push({title, completed:false});
-  localStorage.setItem(`sf_tasks_${user.email}`, JSON.stringify(tasks));
-  document.getElementById('taskTitle').value='';
-  renderTasks();
-  updateDashboardCounts();
-}
-function renderTasks(){
-  const taskList = document.getElementById('taskList');
-  taskList.innerHTML='';
-  tasks.forEach((t,i)=>{
-    const li = document.createElement('li');
-    li.className='list-group-item d-flex justify-content-between align-items-center';
-    li.innerHTML=`<span>${t.title}</span><input type="checkbox" ${t.completed?'checked':''} onchange="toggleTask(${i})">`;
-    taskList.appendChild(li);
-  });
-}
-function toggleTask(i){
-  tasks[i].completed = !tasks[i].completed;
-  const user = JSON.parse(localStorage.getItem('sf_currentUser'));
-  localStorage.setItem(`sf_tasks_${user.email}`, JSON.stringify(tasks));
-  renderTasks();
-  updateDashboardCounts();
-}
-
-// ------------------- NOTES -------------------
-let notes = [];
-function loadNotes(){
-  const user = JSON.parse(localStorage.getItem('sf_currentUser'));
-  notes = JSON.parse(localStorage.getItem(`sf_notes_${user.email}`))||[];
-  renderNotes();
-  updateDashboardCounts();
-}
-function addNote(){
-  const content = document.getElementById('noteContent').value.trim();
-  if(content==="") return;
-  const user = JSON.parse(localStorage.getItem('sf_currentUser'));
-  notes.push({content});
-  localStorage.setItem(`sf_notes_${user.email}`, JSON.stringify(notes));
-  document.getElementById('noteContent').value='';
-  renderNotes();
-  updateDashboardCounts();
-}
-function renderNotes(){
-  const container = document.getElementById('notesContainer');
-  container.innerHTML='';
-  notes.forEach(n=>{
-    const div = document.createElement('div');
-    div.className='sticky-note';
-    div.innerText = n.content;
-    container.appendChild(div);
-  });
-}
-
-// ------------------- DASHBOARD COUNTS -------------------
-function updateDashboardCounts(){
-  const totalTasks = tasks.length;
-  const completedTasks = tasks.filter(t=>t.completed).length;
-  const notesCount = notes.length;
-  document.getElementById('totalTasks').innerText=totalTasks;
-  document.getElementById('completedTasks').innerText=completedTasks;
-  document.getElementById('notesCount').innerText=notesCount;
-  document.getElementById('tasksProgress').style.width=totalTasks?`${(totalTasks/10)*100}%`:'0%';
-  document.getElementById('completedProgress').style.width=totalTasks?`${(completedTasks/totalTasks)*100}%`:'0%';
-  document.getElementById('notesProgress').style.width=notesCount?`${(notesCount/10)*100}%`:'0%';
-}
-
-// ------------------- ANALYTICS -------------------
-function loadAnalytics(){
-  const ctxTasks = document.getElementById('tasksChart').getContext('2d');
-  new Chart(ctxTasks, {
-    type:'pie',
-    data:{
-      labels:['Completed','Pending'],
-      datasets:[{label:'Tasks', data:[tasks.filter(t=>t.completed).length,tasks.filter(t=>!t.completed).length], backgroundColor:['#57B894','#4EA685'] }]
-    }
-  });
-
-  const ctxNotes = document.getElementById('notesChart').getContext('2d');
-  new Chart(ctxNotes,{
-    type:'bar',
-    data:{
-      labels: notes.map((n,i)=>`Note ${i+1}`),
-      datasets:[{label:'Notes', data:notes.map(()=>1), backgroundColor:'#57B894'}]
-    },
-    options:{responsive:true, plugins:{legend:{display:false}}}
-  });
-}
-setInterval(loadAnalytics,2000); // refresh charts
+document.getElementById('refresh-quote').addEventListener('click', fetchQuote);
+document.getElementById('copy-quote').addEventListener('click', ()=>{
+  const quote = QUOTE_EL.textContent.replace(/[“”]/g, '').trim();
+  navigator.clipboard.writeText(quote)
+    .then(() => alert('Quote copied to clipboard!'))
+    .catch(err => console.error('Could not copy text: ', err));
+});
 </script>
-
 </body>
-</html> 
+</html>
