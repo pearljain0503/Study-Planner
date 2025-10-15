@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Pastel Planner — Plan, Prep, Prevail</title>
+  <title>Study Planner — Plan, Prep, Prevail</title>
 
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -440,9 +440,15 @@
         <div class="collapse navbar-collapse" id="navMenu">
           <!-- give this ul the id 'nav' so SPA routing code can toggle active state on its links -->
           <ul class="navbar-nav me-auto mb-2 mb-lg-0" id="nav">
-            <li class="nav-item"><a class="nav-link active" href="#/">Dashboard</a></li>
-            <li class="nav-item"><a class="nav-link" href="#/planner">Planner</a></li>
-            <li class="nav-item"><a class="nav-link" href="#/analytics">Analytics</a></li>
+           <li class="nav-item"><a class="nav-link active" href="#/">Dashboard</a></li>
+<li class="nav-item"><a class="nav-link" href="#/planner">Planner</a></li>
+<li class="nav-item">
+  <a class="nav-link" href="Todo/" target="_blank">📝 To-Do</a>
+</li>
+
+
+<li class="nav-item"><a class="nav-link" href="#/analytics">Analytics</a></li>
+
           </ul>
 
           <div class="dropdown">
@@ -612,6 +618,16 @@
             </div>
           </div>
         </section>
+        <!-- To-Do List -->
+        <section id="todo-section" style="display:none;">
+  <h2>📝 To-Do List</h2>
+  <div class="todo-container">
+    <input type="text" id="todo-input" placeholder="Add a new task..." />
+    <button id="add-task">Add</button>
+    <ul id="todo-list"></ul>
+  </div>
+</section>
+
 
         <!-- Analytics -->
         <section id="view-analytics" class="view" style="display:none;">
@@ -1077,9 +1093,11 @@
 
     // goto-today button is already wired above; ensure label shows current selection on load
     selectedLabel.textContent = 'Selected: ' + selectedDate;
+    
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  
 </body>
 
-</html>
+</html>  
