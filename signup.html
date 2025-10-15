@@ -251,35 +251,6 @@
   </div>
 
   <script>
-const container = document.getElementById('container');
-
-// Toggle panels
-document.getElementById('sign-up-btn').onclick = () => container.classList.add('sign-up-mode');
-document.getElementById('sign-in-btn').onclick = () => container.classList.remove('sign-up-mode');
-
-// SIGN UP FUNCTION
-function signup() {
-  const username = document.querySelector('.sign-up-form input[placeholder="Username"]').value.trim();
-  const email = document.querySelector('.sign-up-form input[placeholder="Email"]').value.trim();
-  const password = document.querySelector('.sign-up-form input[placeholder="Password"]').value.trim();
-
-  if(!username || !email || !password){
-    alert("Please fill all fields!");
-    return;
-  }
-
-  // Save to localStorage
-  localStorage.setItem('sf_username', username);
-  localStorage.setItem('sf_email', email);
-  localStorage.setItem('sf_password', password);
-
-  alert("Account Created Successfully!");
-  // Optionally switch to login panel
-  container.classList.remove('sign-up-mode');
-}
-
-// LOGIN FUNCTION
-// LOGIN FUNCTION
 function login() {
   const username = document.querySelector('.sign-in-form input[placeholder="Username"]').value.trim();
   const password = document.querySelector('.sign-in-form input[placeholder="Password"]').value.trim();
@@ -287,18 +258,37 @@ function login() {
   const storedUsername = localStorage.getItem('sf_username');
   const storedPassword = localStorage.getItem('sf_password');
 
-  if(username === storedUsername && password === storedPassword){
+  if (username === storedUsername && password === storedPassword) {
     alert("Login Successful!");
+    localStorage.setItem("loggedInUser", username);
 
-    // Redirect user to a simple navigation page (after login)
+    // ✅ Redirect to studyplanner.html after successful login
     window.location.href = "planner/studyplanner.html";
-
   } else {
     alert("Invalid username or password!");
   }
 }
 
+function signup() {
+  const username = document.querySelector('.sign-up-form input[placeholder="Username"]').value.trim();
+  const email = document.querySelector('.sign-up-form input[placeholder="Email"]').value.trim();
+  const password = document.querySelector('.sign-up-form input[placeholder="Password"]').value.trim();
 
+  if (!username || !email || !password) {
+    alert("Please fill all fields!");
+    return;
+  }
+
+  localStorage.setItem('sf_username', username);
+  localStorage.setItem('sf_email', email);
+  localStorage.setItem('sf_password', password);
+  localStorage.setItem('loggedInUser', username);
+
+  alert("Account Created Successfully!");
+
+  // ✅ Redirect to studyplanner.html after successful signup
+  window.location.href = "planner/studyplanner.html";
+}
 </script>
 
 

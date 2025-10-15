@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Study Planner — Plan, Prep, Prevail</title>
+  <title>Study  Planner — Plan, Prep, Prevail</title>
 
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -443,8 +443,9 @@
            <li class="nav-item"><a class="nav-link active" href="#/">Dashboard</a></li>
 <li class="nav-item"><a class="nav-link" href="#/planner">Planner</a></li>
 <li class="nav-item">
-  <a class="nav-link" href="Todo/" target="_blank">📝 To-Do</a>
+  <a class="nav-link" href="../ToDo/index.html">ToDo</a>
 </li>
+
 
 
 <li class="nav-item"><a class="nav-link" href="#/analytics">Analytics</a></li>
@@ -452,14 +453,16 @@
           </ul>
 
           <div class="dropdown">
-            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
-              <img src="https://cdn-icons-png.flaticon.com/512/219/219983.png" class="avatar me-2" alt="User">
-              <span>Pearl</span>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-              <li><a class="dropdown-item text-danger" href="#">Logout</a></li>
-            </ul>
-          </div>
+  <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+    data-bs-toggle="dropdown">
+    <img src="https://cdn-icons-png.flaticon.com/512/219/219983.png" class="avatar me-2" alt="User">
+    <span id="displayUsername">Profile</span> <!-- ✅ This will show the username -->
+  </a>
+  <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+    <li><a class="dropdown-item text-danger" href="#">Logout</a></li>
+  </ul>
+</div>
+
         </div>
       </div>
     </nav>
@@ -471,11 +474,7 @@
         <div class="card" style="margin-bottom:12px">
           <div style="display:flex;justify-content:space-between;align-items:center;">
             <div>
-              <div style="font-size:13px;color:var(--muted)">Welcome</div>
-              <div style="font-weight:800">Pearl</div>
-            </div>
-            <div style="text-align:center;">
-              <div class="badge">PRO</div>
+<div style="font-size:25px;color:var(--muted); font-weight:800;"><strong>Welcome</strong></div>
             </div>
           </div>
         </div>
@@ -508,7 +507,6 @@
           <div class="card"
             style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
             <div>
-              <h2 style="margin:0">Welcome back, Pearl</h2>
               <div class="subtitle">Focus on today's priorities</div>
             </div>
             <div style="text-align:right">
@@ -1097,7 +1095,17 @@
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  
+  <script>
+const username = localStorage.getItem("loggedInUser");
+if (username) {
+  const nameSpan = document.getElementById("displayUsername");
+  if (nameSpan) {
+    nameSpan.textContent = username; // Show the username
+  }
+} else {
+  window.location.href = "../signup.html"; // redirect if not logged in
+}
+</script>
 </body>
 
 </html>  
